@@ -1,0 +1,54 @@
+.container {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .title {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .cardContainer {
+    margin: 20px 0;
+  }
+  
+  .cardImage {
+    width: 150px;
+    margin: 0 auto;
+  }
+  
+  .score {
+    font-size: 24px;
+    margin: 10px 0;
+    color: #555;
+  }
+  
+  .button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .higherButton {
+    background-color: #0070f3;
+    color: white;
+  }
+  
+  .lowerButton {
+    background-color: #ff4081;
+    color: white;
+  }
+  
+  .cashOutButton {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .restartButton {
+    background-color: #333;
+    color: white;
+  }
+  
