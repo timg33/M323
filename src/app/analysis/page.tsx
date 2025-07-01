@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useBalance } from '../context/balanceContext';
 import styles from '../styles/analysis.module.css';
 
-// Functional Programming: Pure types for analysis
+// Funktionales Programmieren: Reine Typen für Analyse
 interface DateRange {
   start: Date;
   end: Date;
@@ -34,9 +34,7 @@ interface GameVariantStats {
   avgSession: number;
 }
 
-
-
-// Functional Programming: Pure function to create date ranges
+// Funktionales Programmieren: Reine Funktion zur Erstellung von Datumsbereichen
 const createDateRanges = (): DateRange[] => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -55,7 +53,7 @@ const createDateRanges = (): DateRange[] => {
   ];
 };
 
-// Functional Programming: Pure function to filter transactions by date range
+// Funktionales Programmieren: Reine Funktion zum Filtern von Transaktionen nach Datumsbereich
 const filterTransactionsByDateRange = (transactions: any[], range: DateRange) => {
   return transactions.filter(transaction => {
     const transactionDate = new Date(transaction.timestamp);
@@ -63,7 +61,7 @@ const filterTransactionsByDateRange = (transactions: any[], range: DateRange) =>
   });
 };
 
-// Functional Programming: Pure function to calculate profit/loss metrics
+// Funktionales Programmieren: Reine Funktion zur Berechnung von Gewinn/Verlust-Metriken
 const calculateProfitLoss = (transactions: any[]): ProfitLossData => {
   const gameTransactions = transactions.filter(t => 
     t.type === 'game-win' || t.type === 'game-loss'
@@ -99,7 +97,7 @@ const calculateProfitLoss = (transactions: any[]): ProfitLossData => {
   };
 };
 
-// Functional Programming: Pure function to analyze game variants
+// Funktionales Programmieren: Reine Funktion zur Analyse von Spielvarianten
 const analyzeGameVariants = (transactions: any[]): GameVariantStats[] => {
   const variantMap = new Map<string, {
     entryCosts: number[];
@@ -151,21 +149,19 @@ const analyzeGameVariants = (transactions: any[]): GameVariantStats[] => {
   }).filter(stats => stats.played > 0);
 };
 
-
-
-// Functional Programming: Pure function to format currency
+// Funktionales Programmieren: Reine Funktion zur Währungsformatierung
 const formatCurrency = (amount: number): string => {
   const sign = amount >= 0 ? '+' : '-';
   const absAmount = Math.abs(amount);
   return `${sign}$${absAmount.toLocaleString()}`;
 };
 
-// Functional Programming: Pure function to format percentage
+// Funktionales Programmieren: Reine Funktion zur Prozentformatierung
 const formatPercentage = (value: number): string => {
   return `${value.toFixed(1)}%`;
 };
 
-// Functional Programming: Pure function to get profit color
+// Funktionales Programmieren: Reine Funktion zur Erhaltung von Gewinn-Farben
 const getProfitColor = (amount: number): string => {
   if (amount > 0) return 'var(--casino-green)';
   if (amount < 0) return 'var(--casino-red)';
@@ -173,7 +169,7 @@ const getProfitColor = (amount: number): string => {
 };
 
 export default function AnalysisPage() {
-  const [selectedRange, setSelectedRange] = useState(0); // All Time by default
+  const [selectedRange, setSelectedRange] = useState(0);
   const [hasMounted, setHasMounted] = useState(false);
   const { transactions, balance } = useBalance();
 
@@ -181,7 +177,7 @@ export default function AnalysisPage() {
     setHasMounted(true);
   }, []);
 
-  // Functional Programming: Memoized calculations
+  // Funktionales Programmieren: Memoized Berechnungen
   const dateRanges = useMemo(() => createDateRanges(), []);
   
   const filteredTransactions = useMemo(() => {
@@ -195,8 +191,6 @@ export default function AnalysisPage() {
   const variantStats = useMemo(() => {
     return analyzeGameVariants(filteredTransactions);
   }, [filteredTransactions]);
-
-
 
   const recentTransactions = useMemo(() => {
     return transactions
@@ -218,7 +212,6 @@ export default function AnalysisPage() {
         <p className={styles.subtitle}>Comprehensive financial performance tracking</p>
       </div>
 
-      {/* Date Range Selector */}
       <div className={styles.dateRangeSelector}>
         {dateRanges.map((range, index) => (
           <button
@@ -231,7 +224,6 @@ export default function AnalysisPage() {
         ))}
       </div>
 
-      {/* Key Metrics */}
       <div className={styles.metricsGrid}>
         <div className={styles.metricCard}>
           <div className={styles.metricHeader}>
@@ -258,73 +250,49 @@ export default function AnalysisPage() {
             {formatPercentage(profitLossData.winRate)}
           </div>
           <div className={styles.metricSubtext}>
-            {profitLossData.totalTransactions > 0 ? 
-              `${Math.round(profitLossData.winRate / 100 * profitLossData.totalTransactions)} wins` : 
-              'No games played'}
+            Success ratio
           </div>
         </div>
 
         <div className={styles.metricCard}>
           <div className={styles.metricHeader}>
-            <span className={styles.metricIcon}>💎</span>
+            <span className={styles.metricIcon}>🏆</span>
             <h3>Biggest Win</h3>
           </div>
-          <div className={styles.metricValue} style={{ color: 'var(--casino-green)' }}>
+          <div 
+            className={styles.metricValue}
+            style={{ color: 'var(--casino-green)' }}
+          >
             {formatCurrency(profitLossData.biggestWin)}
           </div>
           <div className={styles.metricSubtext}>
-            Avg Win: {formatCurrency(profitLossData.averageWin)}
+            Single best result
           </div>
         </div>
 
         <div className={styles.metricCard}>
           <div className={styles.metricHeader}>
-            <span className={styles.metricIcon}>📉</span>
-            <h3>Biggest Loss</h3>
-          </div>
-          <div className={styles.metricValue} style={{ color: 'var(--casino-red)' }}>
-            -{formatCurrency(profitLossData.biggestLoss)}
-          </div>
-          <div className={styles.metricSubtext}>
-            Avg Loss: {formatCurrency(profitLossData.averageLoss)}
-          </div>
-        </div>
-
-        <div className={styles.metricCard}>
-          <div className={styles.metricHeader}>
-            <span className={styles.metricIcon}>⚖️</span>
+            <span className={styles.metricIcon}>📊</span>
             <h3>Profit Factor</h3>
           </div>
-          <div className={styles.metricValue}>
+          <div 
+            className={styles.metricValue}
+            style={{ color: getProfitColor(profitLossData.profitFactor - 1) }}
+          >
             {profitLossData.profitFactor === Infinity ? '∞' : profitLossData.profitFactor.toFixed(2)}
           </div>
           <div className={styles.metricSubtext}>
-            {profitLossData.profitFactor > 1 ? 'Profitable' : 
-             profitLossData.profitFactor === 1 ? 'Break Even' : 'Losing'}
-          </div>
-        </div>
-
-        <div className={styles.metricCard}>
-          <div className={styles.metricHeader}>
-            <span className={styles.metricIcon}>🏦</span>
-            <h3>Current Balance</h3>
-          </div>
-          <div className={styles.metricValue}>
-            ${balance.toLocaleString()}
-          </div>
-          <div className={styles.metricSubtext}>
-            Available funds
+            Profit / Loss ratio
           </div>
         </div>
       </div>
 
-      {/* Game Variant Performance */}
       {variantStats.length > 0 && (
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>🎰 Game Variant Performance</h2>
           <div className={styles.variantGrid}>
-            {variantStats.map((variant, index) => (
-              <div key={index} className={styles.variantCard}>
+            {variantStats.map(variant => (
+              <div key={variant.variant} className={styles.variantCard}>
                 <h3 className={styles.variantName}>{variant.variant}</h3>
                 <div className={styles.variantStats}>
                   <div className={styles.variantStat}>
@@ -342,10 +310,12 @@ export default function AnalysisPage() {
                   </div>
                   <div className={styles.variantStat}>
                     <span className={styles.statLabel}>Win Rate</span>
-                    <span className={styles.statValue}>{formatPercentage(variant.winRate)}</span>
+                    <span className={styles.statValue}>
+                      {formatPercentage(variant.winRate)}
+                    </span>
                   </div>
                   <div className={styles.variantStat}>
-                    <span className={styles.statLabel}>Avg per Session</span>
+                    <span className={styles.statLabel}>Avg Session</span>
                     <span 
                       className={styles.statValue}
                       style={{ color: getProfitColor(variant.avgSession) }}
@@ -359,85 +329,6 @@ export default function AnalysisPage() {
           </div>
         </div>
       )}
-
-
-
-      {/* Recent Transactions */}
-      {recentTransactions.length > 0 && (
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>📋 Recent Transactions</h2>
-          <div className={styles.transactionsList}>
-            {recentTransactions.map((transaction, index) => (
-              <div key={index} className={styles.transactionItem}>
-                <div className={styles.transactionIcon}>
-                  {transaction.type === 'game-win' ? '🎉' :
-                   transaction.type === 'game-loss' ? '💔' :
-                   transaction.type === 'cash-in' ? '💳' :
-                   transaction.type === 'cash-out' ? '🏦' :
-                   transaction.type === 'entry-fee' ? '🎰' : '📄'}
-                </div>
-                <div className={styles.transactionDetails}>
-                  <div className={styles.transactionDescription}>
-                    {transaction.description}
-                  </div>
-                  <div className={styles.transactionTime}>
-                    {transaction.timestamp.toLocaleString()}
-                  </div>
-                </div>
-                <div 
-                  className={styles.transactionAmount}
-                  style={{ color: getProfitColor(transaction.amount) }}
-                >
-                  {formatCurrency(transaction.amount)}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Performance Insights */}
-      <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>💡 Performance Insights</h2>
-        <div className={styles.insightsGrid}>
-          <div className={styles.insightCard}>
-            <h3>🎯 Strategy Recommendation</h3>
-            <p>
-              {profitLossData.winRate > 60 ? 
-                "Excellent win rate! Consider increasing bet sizes on confident plays." :
-                profitLossData.winRate > 45 ? 
-                "Good performance. Focus on consistency and bankroll management." :
-                "Work on game strategy. Consider playing lower-risk variants or studying tutorials."}
-            </p>
-          </div>
-          
-          <div className={styles.insightCard}>
-            <h3>💰 Bankroll Health</h3>
-            <p>
-              {balance > 1000 ? 
-                "Strong bankroll position. You can afford higher-risk plays." :
-                balance > 500 ? 
-                "Moderate bankroll. Play conservatively and build your funds." :
-                "Low bankroll. Focus on cash-in and low-risk games to rebuild."}
-            </p>
-          </div>
-          
-          <div className={styles.insightCard}>
-            <h3>⚡ Best Variant</h3>
-            <p>
-              {variantStats.length > 0 ? 
-                `${variantStats.reduce((best, current) => 
-                  current.netProfit > best.netProfit ? current : best
-                ).variant} is your most profitable variant with ${formatCurrency(
-                  variantStats.reduce((best, current) => 
-                    current.netProfit > best.netProfit ? current : best
-                  ).netProfit
-                )} profit.` :
-                "Play more games to identify your best performing variant."}
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 } 

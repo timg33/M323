@@ -11,7 +11,7 @@ import styles from "../styles/game.module.css";
 
 const API_BASE = "https://deckofcardsapi.com/api/deck";
 
-// Functional Programming: Pure function for card value mapping
+// Funktionales Programmieren: Reine Funktion für Kartenwert-Zuordnung
 const getCardValue = (value: string): number => {
   const cardValueMap: Record<string, number> = {
     "ACE": 1,
@@ -23,7 +23,7 @@ const getCardValue = (value: string): number => {
   return cardValueMap[value] || 0;
 };
 
-// Functional Programming: Pure function for probability calculation
+// Funktionales Programmieren: Reine Funktion für Wahrscheinlichkeitsberechnung
 const calculateWinProbability = (currentValue: number, isHigherGuess: boolean): number => {
   const totalCards = 13;
   const favorableOutcomes = isHigherGuess 
@@ -32,17 +32,17 @@ const calculateWinProbability = (currentValue: number, isHigherGuess: boolean): 
   return Math.max(0, Math.round((favorableOutcomes / totalCards) * 100));
 };
 
-// Functional Programming: Currying for guess validation
+// Funktionales Programmieren: Currying für Vermutungsvalidierung
 const validateGuess = (prevValue: number) => 
   (nextValue: number) => 
     (isHigherGuess: boolean): boolean => 
       isHigherGuess ? nextValue > prevValue : nextValue < prevValue;
 
-// Functional Programming: Pure function for card name formatting
+// Funktionales Programmieren: Reine Funktion für Kartenname-Formatierung
 const formatCardName = (card: Card): string => 
   `${card.value} of ${card.suit}`;
 
-// Functional Programming: Pure function to create initial game state
+// Funktionales Programmieren: Reine Funktion zur Erstellung des anfänglichen Spielzustands
 const createInitialGameState = (): GameState => ({
   gameStarted: false,
   deckId: null,
@@ -71,12 +71,12 @@ function GamePage() {
   const [tutorialVariant, setTutorialVariant] = useState<GameVariant | null>(null);
   const { balance, setBalance } = useBalance();
 
-  // Functional Programming: Pure function to update game state immutably
+  // Funktionales Programmieren: Reine Funktion zur unveränderlichen Aktualisierung des Spielzustands
   const updateGameState = useCallback((updates: Partial<GameState>) => {
     setGameState(prevState => ({ ...prevState, ...updates }));
   }, []);
 
-  // Functional Programming: Higher-order function for API calls
+  // Funktionales Programmieren: Höhere Funktion für API-Aufrufe
   const createApiCall = (endpoint: string) => async (): Promise<any> => {
     const response = await fetch(endpoint);
     return response.json();
@@ -84,7 +84,6 @@ function GamePage() {
 
   useEffect(() => {
     setHasMounted(true);
-    // Load saved stats
     const savedStats = localStorage.getItem('higherLowerStats');
     if (savedStats) {
       const stats = JSON.parse(savedStats);
@@ -94,14 +93,13 @@ function GamePage() {
       });
     }
     
-    // Auto-select classic variant by default
     const defaultVariant = getVariantById('classic');
     if (defaultVariant) {
       setSelectedVariant(defaultVariant);
     }
   }, [updateGameState]);
 
-  // Functional Programming: Pure function to save game statistics
+  // Funktionales Programmieren: Reine Funktion zum Speichern von Spielstatistiken
   const saveGameStats = useCallback((finalScore: number, variantId: string) => {
     const stats = {
       totalGames: gameState.totalGames + 1,
@@ -113,7 +111,7 @@ function GamePage() {
     updateGameState(stats);
   }, [gameState.totalGames, gameState.bestScore, updateGameState]);
 
-  // Functional Programming: Effect for updating special actions
+  // Funktionales Programmieren: Effekt zur Aktualisierung spezieller Aktionen
   useEffect(() => {
     if (selectedVariant && selectedVariant.getSpecialActions) {
       const actions = selectedVariant.getSpecialActions(gameState);
@@ -123,21 +121,20 @@ function GamePage() {
     }
   }, [selectedVariant, gameState]);
 
-  // Functional Programming: Get all possible special actions for consistent UI
+  // Funktionales Programmieren: Abrufen aller möglichen speziellen Aktionen für konsistente UI
   const getAllPossibleActions = useMemo(() => {
     if (!selectedVariant?.getSpecialActions) return [];
     
-    // Create a mock game state to get all possible actions
     const mockState: GameState = {
       ...gameState,
-      score: 1000, // High score to ensure all actions appear as available
+      score: 1000,
       streak: 10,
       doubleOrNothingActive: false,
       specialMode: undefined
     };
     
     return selectedVariant.getSpecialActions(mockState);
-  }, [selectedVariant, gameState.specialMode]); // Only depend on variant and special mode
+  }, [selectedVariant, gameState.specialMode]);
 
   const startNewDeck = useCallback(async () => {
     updateGameState({ loading: true });
@@ -173,7 +170,7 @@ function GamePage() {
     await startNewDeck();
   }, [balance, setBalance, selectedVariant, updateGameState, startNewDeck]);
 
-  // Functional Programming: Function composition for guess processing using variant logic
+  // Funktionales Programmieren: Funktionskomposition für Vermutungsverarbeitung mit Varianten-Logik
   const processGuess = useCallback(async (isHigherGuess: boolean) => {
     if (!gameState.deckId || !gameState.currentCard || !selectedVariant) return;
 
@@ -191,13 +188,11 @@ function GamePage() {
         lastRoundCorrect: isCorrect
       });
 
-      // Use variant-specific guess processing
       const variantUpdates = selectedVariant.processGuess(gameState, isCorrect, probability);
       
       if (variantUpdates.gameOver) {
         saveGameStats(variantUpdates.score ?? gameState.score, selectedVariant.id);
       } else if (isCorrect) {
-        // Update current card for next round
         variantUpdates.currentCard = nextCard;
       }
       
@@ -215,7 +210,6 @@ function GamePage() {
     saveGameStats(gameState.score, selectedVariant.id);
     updateGameState({ gameWon: true });
     
-    // Save to highscores
     const highscores = JSON.parse(localStorage.getItem('highscores') || '[]');
     const newScore = {
       score: gameState.score,
@@ -246,7 +240,6 @@ function GamePage() {
     updateGameState(actionResult);
   }, [gameState, updateGameState]);
 
-  // Tutorial handlers
   const handleTutorial = useCallback((variant: GameVariant) => {
     setTutorialVariant(variant);
     setShowTutorial(true);
@@ -264,7 +257,6 @@ function GamePage() {
     }
   }, [tutorialVariant, closeTutorial]);
 
-  // Probability calculation for current card
   const currentProbability = gameState.currentCard ? {
     higher: calculateWinProbability(getCardValue(gameState.currentCard.value), true),
     lower: calculateWinProbability(getCardValue(gameState.currentCard.value), false)
@@ -459,7 +451,6 @@ function GamePage() {
               const availableAction = availableActions.find(a => a.id === action.id);
               const isAvailable = availableAction && availableAction.available && availableAction.cost <= gameState.score;
               
-              // Check if this special action is currently active
               const isActive = (
                 (action.id === 'double-or-nothing' && gameState.doubleOrNothingActive) ||
                 (action.id === 'multiplier-boost' && gameState.specialMode === 'multiplier-boost')

@@ -11,43 +11,42 @@ interface VariantSelectorProps {
   onTutorial?: (variant: GameVariant) => void;
 }
 
-// Functional Programming: Pure function to check if variant is affordable
+// Funktionales Programmieren: Reine Funktion zur Überprüfung ob Variante erschwinglich ist
 const canAffordVariant = (balance: number, entryCost: number): boolean => {
   return balance >= entryCost;
 };
 
-// Functional Programming: Pure function to format features list
+// Funktionales Programmieren: Reine Funktion zur Formatierung der Feature-Liste
 const formatFeatures = (features: string[]): string => {
   return features.join(' • ');
 };
 
-// Functional Programming: Pure function to get variant recommendation
+// Funktionales Programmieren: Reine Funktion zur Erhaltung von Varianten-Empfehlungen
 const getVariantRecommendation = (balance: number, variants: GameVariant[]): GameVariant => {
   const affordableVariants = variants.filter(variant => canAffordVariant(balance, variant.entryCost));
   
-  if (affordableVariants.length === 0) return variants[0]; // Return cheapest if none affordable
+  if (affordableVariants.length === 0) return variants[0];
   
-  // Recommend based on balance level
   if (balance >= 500) return variants.find(v => v.id === 'double-or-nothing') || variants[0];
   if (balance >= 300) return variants.find(v => v.id === 'streak-master') || variants[0];
   return variants.find(v => v.id === 'classic') || variants[0];
 };
 
-// Functional Programming: Pure component using immutable props
+// Funktionales Programmieren: Reine Komponente mit unveränderlichen Props
 export default function VariantSelector({ onSelectVariant, onTutorial }: VariantSelectorProps) {
   const [hoveredVariant, setHoveredVariant] = useState<string | null>(null);
   const { balance } = useBalance();
   const variants = getGameVariants();
   const recommendedVariant = getVariantRecommendation(balance, variants);
 
-  // Functional Programming: Pure function to handle variant selection
+  // Funktionales Programmieren: Reine Funktion zur Behandlung der Varianten-Auswahl
   const handleVariantSelect = (variant: GameVariant) => {
     if (canAffordVariant(balance, variant.entryCost)) {
       onSelectVariant(variant);
     }
   };
 
-  // Functional Programming: Pure function to get card styling
+  // Funktionales Programmieren: Reine Funktion zur Erhaltung von Karten-Styling
   const getCardStyling = (variant: GameVariant, isHovered: boolean, isAffordable: boolean) => {
     let className = styles.variantCard;
     

@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { useBalance } from '../context/balanceContext';
 import styles from '../styles/wallet.module.css';
 
-// Functional Programming: Pure types for wallet operations
+// Funktionales Programmieren: Reine Typen für Wallet-Operationen
 interface WalletAction {
   id: string;
   name: string;
@@ -13,7 +13,7 @@ interface WalletAction {
   action: (amount: number) => boolean | void;
 }
 
-// Functional Programming: Pure function to format currency
+// Funktionales Programmieren: Reine Funktion zur Währungsformatierung
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -23,7 +23,7 @@ const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
-// Functional Programming: Pure function to format date
+// Funktionales Programmieren: Reine Funktion zur Datumsformatierung
 const formatDate = (date: Date): string => {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -33,7 +33,7 @@ const formatDate = (date: Date): string => {
   }).format(date);
 };
 
-// Functional Programming: Pure function to get transaction icon
+// Funktionales Programmieren: Reine Funktion zur Erhaltung von Transaktions-Icons
 const getTransactionIcon = (type: string): string => {
   const iconMap: Record<string, string> = {
     'cash-in': '💰',
@@ -45,7 +45,7 @@ const getTransactionIcon = (type: string): string => {
   return iconMap[type] || '💳';
 };
 
-// Functional Programming: Pure function to get transaction color
+// Funktionales Programmieren: Reine Funktion zur Erhaltung von Transaktions-Farben
 const getTransactionColor = (type: string): string => {
   const colorMap: Record<string, string> = {
     'cash-in': 'var(--casino-gold)',
@@ -57,7 +57,7 @@ const getTransactionColor = (type: string): string => {
   return colorMap[type] || 'var(--casino-silver)';
 };
 
-// Functional Programming: Pure function to create quick amount options
+// Funktionales Programmieren: Reine Funktion zur Erstellung von Schnellbeträgen
 const createQuickAmounts = (): number[] => [100, 500, 1000, 2500, 5000, 10000];
 
 export default function WalletPage() {
@@ -66,7 +66,7 @@ export default function WalletPage() {
   const [selectedPeriod, setSelectedPeriod] = useState<'all' | 'week' | 'today'>('all');
   const [showSuccess, setShowSuccess] = useState<string>('');
 
-  // Functional Programming: Memoized wallet actions
+  // Funktionales Programmieren: Memoized Wallet-Aktionen
   const walletActions: WalletAction[] = useMemo(() => [
     {
       id: 'cash-in',
@@ -99,7 +99,7 @@ export default function WalletPage() {
     }
   ], [cashIn, cashOut]);
 
-  // Functional Programming: Memoized filtered transactions
+  // Funktionales Programmieren: Memoized gefilterte Transaktionen
   const filteredTransactions = useMemo(() => {
     switch (selectedPeriod) {
       case 'today':
@@ -111,13 +111,13 @@ export default function WalletPage() {
     }
   }, [transactions, selectedPeriod, getTransactionHistory]);
 
-  // Functional Programming: Pure function to handle amount input
+  // Funktionales Programmieren: Reine Funktion zur Behandlung von Betragseingaben
   const handleAmountChange = (value: string): void => {
     const numValue = value.replace(/[^0-9]/g, '');
     setAmount(numValue);
   };
 
-  // Functional Programming: Pure function to execute wallet action
+  // Funktionales Programmieren: Reine Funktion zur Ausführung von Wallet-Aktionen
   const executeAction = (action: WalletAction): void => {
     const numAmount = parseInt(amount, 10);
     if (isNaN(numAmount) || numAmount <= 0) {
@@ -130,7 +130,7 @@ export default function WalletPage() {
     setAmount('');
   };
 
-  // Functional Programming: Pure function to set quick amount
+  // Funktionales Programmieren: Reine Funktion zum Setzen von Schnellbeträgen
   const setQuickAmount = (quickAmount: number): void => {
     setAmount(quickAmount.toString());
   };
@@ -248,7 +248,7 @@ export default function WalletPage() {
                   }`}
                 >
                   {transaction.type === 'cash-in' || transaction.type === 'game-win' ? '+' : '-'}
-                  {formatCurrency(transaction.amount)}
+                  {formatCurrency(Math.abs(transaction.amount))}
                 </div>
               </div>
             ))

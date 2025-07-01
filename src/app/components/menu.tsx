@@ -5,7 +5,7 @@ import styles from "../styles/menu.module.css";
 import { usePathname } from "next/navigation";
 import { useBalance } from "../context/balanceContext";
 
-// Functional Programming: Pure function to format balance display
+// Funktionales Programmieren: Reine Funktion zur Formatierung der Guthaben-Anzeige
 const formatBalance = (balance: number): string => {
   return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 0,
@@ -13,7 +13,7 @@ const formatBalance = (balance: number): string => {
   }).format(balance);
 };
 
-// Functional Programming: Higher-order function for creating navigation items
+// Funktionales Programmieren: Höhere Funktion zur Erstellung von Navigationselementen
 const createNavItem = (href: string, label: string, icon?: string) => ({
   href,
   label,
@@ -21,7 +21,7 @@ const createNavItem = (href: string, label: string, icon?: string) => ({
   fullLabel: icon ? `${icon} ${label}` : label
 });
 
-// Functional Programming: Pure function using function composition
+// Funktionales Programmieren: Reine Funktion mit Funktionskomposition
 const navigationItems = [
   createNavItem("/", "Home", "🏠"),
   createNavItem("/game", "Game", "🎮"),
@@ -34,7 +34,7 @@ export default function Menu() {
   const pathname = usePathname();
   const { balance } = useBalance();
 
-  // Functional Programming: Pure function to determine if link is active
+  // Funktionales Programmieren: Reine Funktion zur Bestimmung ob Link aktiv ist
   const isActiveLink = (href: string): boolean => pathname === href;
 
   return (

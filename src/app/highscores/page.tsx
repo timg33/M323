@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "../styles/highscores.module.css";
 
-// Functional Programming: Type definition for highscore entry
+// Funktionales Programmieren: Typdefinition für Highscore-Eintrag
 interface HighscoreEntry {
   id: number;
   score: number;
@@ -12,7 +12,7 @@ interface HighscoreEntry {
   playerName?: string;
 }
 
-// Functional Programming: Pure function to format date
+// Funktionales Programmieren: Reine Funktion zur Datumsformatierung
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat('en-US', {
@@ -24,13 +24,13 @@ const formatDate = (dateString: string): string => {
   }).format(date);
 };
 
-// Functional Programming: Pure function to format score with commas
+// Funktionales Programmieren: Reine Funktion zur Score-Formatierung mit Kommas
 const formatScore = (score: number): string => {
   return new Intl.NumberFormat('en-US').format(score);
 };
 
-// Functional Programming: Higher-order function for sorting
-const createSorter = <T>(key: keyof T, direction: 'asc' | 'desc' = 'desc') => 
+// Funktionales Programmieren: Höhere Funktion für Sortierung
+const createSorter = <T,>(key: keyof T, direction: 'asc' | 'desc' = 'desc') => 
   (a: T, b: T): number => {
     const aVal = a[key];
     const bVal = b[key];
@@ -41,7 +41,7 @@ const createSorter = <T>(key: keyof T, direction: 'asc' | 'desc' = 'desc') =>
     return 0;
   };
 
-// Functional Programming: Pure function to get medal emoji
+// Funktionales Programmieren: Reine Funktion zur Erhaltung von Medaillen-Emojis
 const getMedalEmoji = (position: number): string => {
   const medals: Record<number, string> = {
     1: "🥇",
@@ -51,7 +51,7 @@ const getMedalEmoji = (position: number): string => {
   return medals[position] || "🏅";
 };
 
-// Functional Programming: Pure function to get default highscores
+// Funktionales Programmieren: Reine Funktion zur Erhaltung von Standard-Highscores
 const getDefaultHighscores = (): HighscoreEntry[] => [
   { id: 1, score: 2500, date: new Date().toISOString(), playerName: "Casino Master" },
   { id: 2, score: 1800, date: new Date().toISOString(), playerName: "Lucky Seven" },
@@ -65,14 +65,14 @@ export default function HighscoresPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'today' | 'week'>('all');
 
-  // Functional Programming: Effect for loading highscores
+  // Funktionales Programmieren: Effekt zum Laden von Highscores
   useEffect(() => {
     const loadHighscores = () => {
       try {
         const savedScores = localStorage.getItem('highscores');
         const scores = savedScores ? JSON.parse(savedScores) : getDefaultHighscores();
         
-        // Functional Programming: Using map to ensure all entries have required properties
+        // Funktionales Programmieren: Verwendung von map zur Sicherstellung aller erforderlichen Eigenschaften
         const processedScores = scores.map((score: any, index: number) => ({
           id: score.id || Date.now() + index,
           score: score.score || 0,
@@ -92,7 +92,7 @@ export default function HighscoresPage() {
     loadHighscores();
   }, []);
 
-  // Functional Programming: Pure function to filter scores by date
+  // Funktionales Programmieren: Reine Funktion zum Filtern von Scores nach Datum
   const filterScoresByDate = (scores: HighscoreEntry[], filterType: string): HighscoreEntry[] => {
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -111,15 +111,15 @@ export default function HighscoresPage() {
     });
   };
 
-  // Functional Programming: Using function composition for data processing
+  // Funktionales Programmieren: Verwendung von Funktionskomposition für Datenverarbeitung
   const getFilteredAndSortedScores = (): HighscoreEntry[] => {
     const sorter = createSorter<HighscoreEntry>('score', 'desc');
     return filterScoresByDate(highscores, filter)
       .sort(sorter)
-      .slice(0, 10); // Top 10 only
+      .slice(0, 10);
   };
 
-  // Functional Programming: Pure function to get statistics
+  // Funktionales Programmieren: Reine Funktion zur Erhaltung von Statistiken
   const getStatistics = () => {
     const scores = highscores.map(h => h.score);
     return {

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-// Functional Programming: Pure types for transaction system
+// Funktionales Programmieren: Reine Typen für das Transaktionssystem
 interface Transaction {
   id: string;
   type: 'cash-in' | 'cash-out' | 'game-win' | 'game-loss' | 'entry-fee';
@@ -24,10 +24,10 @@ interface BalanceContextType {
   getTransactionHistory: (days?: number) => Transaction[];
 }
 
-// Functional Programming: Pure function to get default balance
+// Funktionales Programmieren: Reine Funktion für Standard-Guthaben
 const getDefaultBalance = (): number => 1000;
 
-// Functional Programming: Pure function to save balance to localStorage
+// Funktionales Programmieren: Reine Funktion zum Speichern des Guthabens in localStorage
 const saveBalance = (balance: number): void => {
   try {
     localStorage.setItem('casinoBalance', balance.toString());
@@ -36,7 +36,7 @@ const saveBalance = (balance: number): void => {
   }
 };
 
-// Functional Programming: Pure function to load balance from localStorage
+// Funktionales Programmieren: Reine Funktion zum Laden des Guthabens aus localStorage
 const loadBalance = (): number => {
   try {
     const saved = localStorage.getItem('casinoBalance');
@@ -50,7 +50,7 @@ const loadBalance = (): number => {
   return getDefaultBalance();
 };
 
-// Functional Programming: Pure functions for transaction management
+// Funktionales Programmieren: Reine Funktionen für Transaktionsverwaltung
 const saveTransactions = (transactions: Transaction[]): void => {
   try {
     localStorage.setItem('casinoTransactions', JSON.stringify(transactions));
@@ -72,19 +72,19 @@ const loadTransactions = (): Transaction[] => {
   return [];
 };
 
-// Functional Programming: Pure function to generate transaction ID
+// Funktionales Programmieren: Reine Funktion zur Generierung von Transaktions-IDs
 const generateTransactionId = (): string => {
   return `tx_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 };
 
-// Functional Programming: Higher-order function for balance operations
+// Funktionales Programmieren: Höhere Funktion für Guthaben-Operationen
 const createBalanceUpdater = (operation: (current: number, amount: number) => number) => 
   (currentBalance: number, amount: number): number => {
     const newBalance = operation(currentBalance, amount);
-    return Math.max(0, newBalance); // Ensure balance never goes negative
+    return Math.max(0, newBalance);
   };
 
-// Functional Programming: Pure functions for balance operations
+// Funktionales Programmieren: Reine Funktionen für Guthaben-Operationen
 const addOperation = (current: number, amount: number): number => current + amount;
 const subtractOperation = (current: number, amount: number): number => current - amount;
 
@@ -106,7 +106,7 @@ export const BalanceProvider = ({ children }: { children: ReactNode }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Functional Programming: Effect for loading initial balance and transactions
+  // Funktionales Programmieren: Effekt zum Laden von anfänglichem Guthaben und Transaktionen
   useEffect(() => {
     const initialBalance = loadBalance();
     const initialTransactions = loadTransactions();
@@ -115,34 +115,34 @@ export const BalanceProvider = ({ children }: { children: ReactNode }) => {
     setIsLoaded(true);
   }, []);
 
-  // Functional Programming: Effect for saving balance changes
+  // Funktionales Programmieren: Effekt zum Speichern von Guthaben-Änderungen
   useEffect(() => {
     if (isLoaded) {
       saveBalance(balance);
     }
   }, [balance, isLoaded]);
 
-  // Functional Programming: Effect for saving transaction changes
+  // Funktionales Programmieren: Effekt zum Speichern von Transaktions-Änderungen
   useEffect(() => {
     if (isLoaded) {
       saveTransactions(transactions);
     }
   }, [transactions, isLoaded]);
 
-  // Functional Programming: Pure function wrapper for setting balance
+  // Funktionales Programmieren: Reine Funktions-Wrapper zum Setzen des Guthabens
   const setBalance = (newBalance: number): void => {
     const sanitizedBalance = Math.max(0, newBalance);
     setBalanceState(sanitizedBalance);
   };
 
-  // Functional Programming: Using the higher-order function for adding to balance
+  // Funktionales Programmieren: Verwendung der höheren Funktion zum Hinzufügen zum Guthaben
   const addToBalance = (amount: number): void => {
     const addUpdater = createBalanceUpdater(addOperation);
-    const newBalance = addUpdater(balance, Math.abs(amount)); // Ensure positive amount
+    const newBalance = addUpdater(balance, Math.abs(amount));
     setBalanceState(newBalance);
   };
 
-  // Functional Programming: Using the higher-order function for subtracting from balance
+  // Funktionales Programmieren: Verwendung der höheren Funktion zum Abziehen vom Guthaben
   const subtractFromBalance = (amount: number): boolean => {
     const positiveAmount = Math.abs(amount);
     if (balance >= positiveAmount) {
@@ -151,16 +151,16 @@ export const BalanceProvider = ({ children }: { children: ReactNode }) => {
       setBalanceState(newBalance);
       return true;
     }
-    return false; // Insufficient funds
+    return false;
   };
 
-  // Functional Programming: Pure function to reset balance
+  // Funktionales Programmieren: Reine Funktion zum Zurücksetzen des Guthabens
   const resetBalance = (): void => {
     const defaultBalance = getDefaultBalance();
     setBalanceState(defaultBalance);
   };
 
-  // Functional Programming: Pure function to add transaction
+  // Funktionales Programmieren: Reine Funktion zum Hinzufügen von Transaktionen
   const addTransaction = (type: Transaction['type'], amount: number, description: string): void => {
     const newTransaction: Transaction = {
       id: generateTransactionId(),
@@ -172,14 +172,14 @@ export const BalanceProvider = ({ children }: { children: ReactNode }) => {
     setTransactions(prev => [newTransaction, ...prev]);
   };
 
-  // Functional Programming: Cash in method with transaction tracking
+  // Funktionales Programmieren: Einzahlungsmethode mit Transaktionsverfolgung
   const cashIn = (amount: number): void => {
     const positiveAmount = Math.abs(amount);
     addToBalance(positiveAmount);
     addTransaction('cash-in', positiveAmount, `Cash In: $${positiveAmount.toLocaleString()}`);
   };
 
-  // Functional Programming: Cash out method with transaction tracking
+  // Funktionales Programmieren: Auszahlungsmethode mit Transaktionsverfolgung
   const cashOut = (amount: number): boolean => {
     const positiveAmount = Math.abs(amount);
     if (subtractFromBalance(positiveAmount)) {
@@ -189,7 +189,7 @@ export const BalanceProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
-  // Functional Programming: Pure function to filter transactions by date
+  // Funktionales Programmieren: Reine Funktion zum Filtern von Transaktionen nach Datum
   const getTransactionHistory = (days?: number): Transaction[] => {
     if (!days) return transactions;
     
@@ -219,7 +219,7 @@ export const BalanceProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Functional Programming: Custom hook with error handling
+// Funktionales Programmieren: Benutzerdefinierter Hook mit Fehlerbehandlung
 export const useBalance = (): BalanceContextType => {
   const context = useContext(BalanceContext);
   if (!context) {

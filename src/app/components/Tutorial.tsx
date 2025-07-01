@@ -5,7 +5,7 @@ import { GameVariant } from '../types/gameTypes';
 import { getGameVariants } from '../utils/gameVariants';
 import styles from '../styles/tutorial.module.css';
 
-// Functional Programming: Pure types for tutorial system
+// Funktionales Programmieren: Reine Typen für das Tutorial-System
 interface TutorialStep {
   id: number;
   title: string;
@@ -23,7 +23,7 @@ interface TutorialData {
   warnings: string[];
 }
 
-// Functional Programming: Pure function to create tutorial content
+// Funktionales Programmieren: Reine Funktion zur Erstellung von Tutorial-Inhalten
 const createTutorialData = (): Record<string, TutorialData> => ({
   'classic': {
     variantId: 'classic',
@@ -188,7 +188,7 @@ const createTutorialData = (): Record<string, TutorialData> => ({
   }
 });
 
-// Functional Programming: Pure function to get tutorial by variant ID
+// Funktionales Programmieren: Reine Funktion zur Erhaltung von Tutorials nach Varianten-ID
 const getTutorialByVariant = (variantId: string): TutorialData | null => {
   const tutorials = createTutorialData();
   return tutorials[variantId] || null;
@@ -202,11 +202,12 @@ interface TutorialProps {
 
 export default function Tutorial({ variant, onClose, onStartGame }: TutorialProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [activeTab, setActiveTab] = useState<'steps' | 'strategies' | 'warnings'>('steps');
+  const [selectedTab, setSelectedTab] = useState<'steps' | 'strategies' | 'warnings'>('steps');
 
-  // Functional Programming: Memoized tutorial data
+  // Funktionales Programmieren: Memoized Tutorial-Daten
   const tutorialData = useMemo(() => {
-    return variant ? getTutorialByVariant(variant.id) : null;
+    if (!variant) return null;
+    return getTutorialByVariant(variant.id);
   }, [variant]);
 
   if (!tutorialData) {
@@ -226,13 +227,15 @@ export default function Tutorial({ variant, onClose, onStartGame }: TutorialProp
     );
   }
 
-  // Functional Programming: Pure functions for navigation
+  // Funktionales Programmieren: Reine Funktionen für Navigation
   const nextStep = (): void => {
-    setCurrentStep(prev => Math.min(prev + 1, tutorialData.steps.length - 1));
+    if (tutorialData && currentStep < tutorialData.steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
   };
 
   const prevStep = (): void => {
-    setCurrentStep(prev => Math.max(prev - 1, 0));
+    if (currentStep > 0) setCurrentStep(currentStep - 1);
   };
 
   const goToStep = (stepIndex: number): void => {
@@ -260,8 +263,8 @@ export default function Tutorial({ variant, onClose, onStartGame }: TutorialProp
           {(['steps', 'strategies', 'warnings'] as const).map(tab => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`${styles.tabButton} ${activeTab === tab ? styles.active : ''}`}
+              onClick={() => setSelectedTab(tab)}
+              className={`${styles.tabButton} ${selectedTab === tab ? styles.active : ''}`}
             >
               {tab === 'steps' && '📚 Tutorial'}
               {tab === 'strategies' && '🎯 Strategies'}
@@ -272,7 +275,7 @@ export default function Tutorial({ variant, onClose, onStartGame }: TutorialProp
 
         {/* Content Area */}
         <div className={styles.tutorialContent}>
-          {activeTab === 'steps' && (
+          {selectedTab === 'steps' && (
             <>
               {/* Step Progress */}
               <div className={styles.stepProgress}>
@@ -330,7 +333,7 @@ export default function Tutorial({ variant, onClose, onStartGame }: TutorialProp
             </>
           )}
 
-          {activeTab === 'strategies' && (
+          {selectedTab === 'strategies' && (
             <div className={styles.listContent}>
               <h3 className={styles.listTitle}>🎯 Winning Strategies</h3>
               <ul className={styles.strategiesList}>
@@ -344,7 +347,7 @@ export default function Tutorial({ variant, onClose, onStartGame }: TutorialProp
             </div>
           )}
 
-          {activeTab === 'warnings' && (
+          {selectedTab === 'warnings' && (
             <div className={styles.listContent}>
               <h3 className={styles.listTitle}>⚠️ Important Warnings</h3>
               <ul className={styles.warningsList}>

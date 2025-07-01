@@ -1,7 +1,7 @@
 import styles from "./styles/page.module.css";
 import Link from "next/link";
 
-// Functional Programming: Pure function to get random feature highlight
+// Funktionales Programmieren: Reine Funktion zur Rückgabe eines zufälligen Feature-Highlights
 const getRandomFeature = (): string => {
   const features = [
     "Smart probability calculations",
@@ -12,14 +12,14 @@ const getRandomFeature = (): string => {
   return features[Math.floor(Math.random() * features.length)];
 };
 
-// Functional Programming: Higher-order function for creating feature objects
+// Funktionales Programmieren: Höhere Funktion zur Erstellung von Feature-Objekten
 const createFeature = (title: string, description: string, icon: string) => ({
   title,
   description,
   icon
 });
 
-// Functional Programming: Pure function using function composition
+// Funktionales Programmieren: Reine Funktion mit Funktionskomposition
 const gameFeatures = [
   createFeature(
     "🎯 Smart Betting", 

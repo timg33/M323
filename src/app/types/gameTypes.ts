@@ -1,4 +1,4 @@
-// Functional Programming: Pure type definitions for game variants system
+// Funktionales Programmieren: Reine Typdefinitionen für das Spielvarianten-System
 
 export interface Card {
   code: string;
@@ -65,14 +65,14 @@ export interface GameStats {
   timeSpent: number;
 }
 
-// Functional Programming: Pure type for probability calculation
+// Funktionales Programmieren: Reiner Typ für Wahrscheinlichkeitsberechnung
 export type ProbabilityCalculator = (currentValue: number, isHigherGuess: boolean) => number;
 
-// Functional Programming: Pure type for reward calculation
+// Funktionales Programmieren: Reiner Typ für Belohnungsberechnung
 export type RewardCalculator = (probability: number, streak: number, multiplier: number) => number;
 
-// Functional Programming: Pure type for game state updates
+// Funktionales Programmieren: Reiner Typ für Spielzustand-Updates
 export type GameStateUpdater = (currentState: GameState, updates: Partial<GameState>) => GameState;
 
-// Functional Programming: Pure type for guess validation
+// Funktionales Programmieren: Reiner Typ für Vermutungsvalidierung
 export type GuessValidator = (prevValue: number, nextValue: number, isHigherGuess: boolean) => boolean; 
