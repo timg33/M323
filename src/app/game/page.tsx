@@ -1,8 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { useBalance } from "../context/balanceContext";
+import { GameState, GameVariant, SpecialAction, Card } from "../types/gameTypes";
+import { getVariantById, getGameVariants } from "../utils/gameVariants";
+import VariantSelector from "../components/VariantSelector";
+import Tutorial from "../components/Tutorial";
 import styles from "../styles/game.module.css";
 
 const API_BASE = "https://deckofcardsapi.com/api/deck";
@@ -28,10 +32,6 @@ const calculateWinProbability = (currentValue: number, isHigherGuess: boolean): 
   return Math.max(0, Math.round((favorableOutcomes / totalCards) * 100));
 };
 
-// Functional Programming: Higher-order function for score calculation
-const createScoreCalculator = (basePayout: number) => 
-  (probability: number): number => Math.round(basePayout * (100 / Math.max(probability, 1)));
-
 // Functional Programming: Currying for guess validation
 const validateGuess = (prevValue: number) => 
   (nextValue: number) => 
@@ -39,33 +39,39 @@ const validateGuess = (prevValue: number) =>
       isHigherGuess ? nextValue > prevValue : nextValue < prevValue;
 
 // Functional Programming: Pure function for card name formatting
-const formatCardName = (card: any): string => 
+const formatCardName = (card: Card): string => 
   `${card.value} of ${card.suit}`;
 
-// Functional Programming: Pure function to create game state
-const createInitialGameState = () => ({
+// Functional Programming: Pure function to create initial game state
+const createInitialGameState = (): GameState => ({
   gameStarted: false,
-  deckId: null as string | null,
-  currentCard: null as any,
+  deckId: null,
+  currentCard: null,
   score: 0,
   gameOver: false,
-  lastRoundCard: null as any,
-  lastRoundCorrect: null as boolean | null,
+  lastRoundCard: null,
+  lastRoundCorrect: null,
   gameWon: false,
   loading: false,
   streak: 0,
   totalGames: 0,
-  bestScore: 0
+  bestScore: 0,
+  multiplier: 1,
+  specialMode: undefined,
+  timeLeft: undefined,
+  doubleOrNothingActive: false
 });
-
-type GameState = ReturnType<typeof createInitialGameState>;
 
 function GamePage() {
   const [hasMounted, setHasMounted] = useState(false);
   const [gameState, setGameState] = useState<GameState>(createInitialGameState);
+  const [selectedVariant, setSelectedVariant] = useState<GameVariant | null>(null);
+  const [availableActions, setAvailableActions] = useState<SpecialAction[]>([]);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialVariant, setTutorialVariant] = useState<GameVariant | null>(null);
   const { balance, setBalance } = useBalance();
 
-  // Functional Programming: Pure function to update game state
+  // Functional Programming: Pure function to update game state immutably
   const updateGameState = useCallback((updates: Partial<GameState>) => {
     setGameState(prevState => ({ ...prevState, ...updates }));
   }, []);
@@ -87,18 +93,51 @@ function GamePage() {
         bestScore: stats.bestScore || 0
       });
     }
+    
+    // Auto-select classic variant by default
+    const defaultVariant = getVariantById('classic');
+    if (defaultVariant) {
+      setSelectedVariant(defaultVariant);
+    }
   }, [updateGameState]);
 
   // Functional Programming: Pure function to save game statistics
-  const saveGameStats = useCallback((finalScore: number) => {
+  const saveGameStats = useCallback((finalScore: number, variantId: string) => {
     const stats = {
       totalGames: gameState.totalGames + 1,
       bestScore: Math.max(gameState.bestScore, finalScore),
-      lastPlayed: Date.now()
+      lastPlayed: Date.now(),
+      variantPlayed: variantId
     };
     localStorage.setItem('higherLowerStats', JSON.stringify(stats));
     updateGameState(stats);
   }, [gameState.totalGames, gameState.bestScore, updateGameState]);
+
+  // Functional Programming: Effect for updating special actions
+  useEffect(() => {
+    if (selectedVariant && selectedVariant.getSpecialActions) {
+      const actions = selectedVariant.getSpecialActions(gameState);
+      setAvailableActions(actions);
+    } else {
+      setAvailableActions([]);
+    }
+  }, [selectedVariant, gameState]);
+
+  // Functional Programming: Get all possible special actions for consistent UI
+  const getAllPossibleActions = useMemo(() => {
+    if (!selectedVariant?.getSpecialActions) return [];
+    
+    // Create a mock game state to get all possible actions
+    const mockState: GameState = {
+      ...gameState,
+      score: 1000, // High score to ensure all actions appear as available
+      streak: 10,
+      doubleOrNothingActive: false,
+      specialMode: undefined
+    };
+    
+    return selectedVariant.getSpecialActions(mockState);
+  }, [selectedVariant, gameState.specialMode]); // Only depend on variant and special mode
 
   const startNewDeck = useCallback(async () => {
     updateGameState({ loading: true });
@@ -115,7 +154,10 @@ function GamePage() {
         lastRoundCorrect: null,
         gameWon: false,
         loading: false,
-        streak: 0
+        streak: 0,
+        multiplier: 1,
+        specialMode: undefined,
+        doubleOrNothingActive: false
       });
     } catch (error) {
       console.error('Failed to start new deck:', error);
@@ -124,15 +166,16 @@ function GamePage() {
   }, [updateGameState]);
 
   const startGame = useCallback(async () => {
-    if (balance < 100) return;
-    setBalance(balance - 100);
+    if (!selectedVariant || balance < selectedVariant.entryCost) return;
+    
+    setBalance(balance - selectedVariant.entryCost);
     updateGameState({ gameStarted: true });
     await startNewDeck();
-  }, [balance, setBalance, updateGameState, startNewDeck]);
+  }, [balance, setBalance, selectedVariant, updateGameState, startNewDeck]);
 
-  // Functional Programming: Function composition for guess processing
+  // Functional Programming: Function composition for guess processing using variant logic
   const processGuess = useCallback(async (isHigherGuess: boolean) => {
-    if (!gameState.deckId || !gameState.currentCard) return;
+    if (!gameState.deckId || !gameState.currentCard || !selectedVariant) return;
 
     try {
       const cardData = await createApiCall(`${API_BASE}/${gameState.deckId}/draw/?count=1`)();
@@ -148,224 +191,319 @@ function GamePage() {
         lastRoundCorrect: isCorrect
       });
 
-      if (isCorrect) {
-        const scoreCalculator = createScoreCalculator(10);
-        const pointsEarned = scoreCalculator(probability);
-        const newScore = gameState.score + pointsEarned;
-        const newStreak = gameState.streak + 1;
-        
-        updateGameState({
-          score: newScore,
-          currentCard: nextCard,
-          streak: newStreak
-        });
-      } else {
-        saveGameStats(gameState.score);
-        updateGameState({ gameOver: true });
+      // Use variant-specific guess processing
+      const variantUpdates = selectedVariant.processGuess(gameState, isCorrect, probability);
+      
+      if (variantUpdates.gameOver) {
+        saveGameStats(variantUpdates.score ?? gameState.score, selectedVariant.id);
+      } else if (isCorrect) {
+        // Update current card for next round
+        variantUpdates.currentCard = nextCard;
       }
+      
+      updateGameState(variantUpdates);
     } catch (error) {
       console.error('Failed to process guess:', error);
     }
-  }, [gameState, updateGameState, saveGameStats]);
+  }, [gameState, selectedVariant, updateGameState, saveGameStats]);
 
   const cashOut = useCallback(() => {
+    if (!selectedVariant) return;
+    
     const finalBalance = balance + gameState.score;
     setBalance(finalBalance);
-    saveGameStats(gameState.score);
+    saveGameStats(gameState.score, selectedVariant.id);
     updateGameState({ gameWon: true });
     
     // Save to highscores
     const highscores = JSON.parse(localStorage.getItem('highscores') || '[]');
-    highscores.push({
+    const newScore = {
       score: gameState.score,
       date: new Date().toISOString(),
-      id: Date.now()
-    });
+      variant: selectedVariant.name,
+      streak: gameState.streak
+    };
+    highscores.push(newScore);
     highscores.sort((a: any, b: any) => b.score - a.score);
-    localStorage.setItem('highscores', JSON.stringify(highscores.slice(0, 10)));
-  }, [balance, setBalance, gameState.score, saveGameStats, updateGameState]);
+    localStorage.setItem('highscores', JSON.stringify(highscores.slice(0, 100)));
+  }, [balance, setBalance, gameState, selectedVariant, saveGameStats, updateGameState]);
 
-  if (!hasMounted) return null;
+  const resetGame = useCallback(async () => {
+    if (selectedVariant && balance >= selectedVariant.entryCost) {
+      setBalance(balance - selectedVariant.entryCost);
+      updateGameState({
+        ...createInitialGameState(),
+        gameStarted: true
+      });
+      await startNewDeck();
+    }
+  }, [updateGameState, selectedVariant, setBalance, balance, startNewDeck]);
 
-  const currentValue = gameState.currentCard ? getCardValue(gameState.currentCard.value) : null;
-  const probabilityHigher = currentValue !== null ? calculateWinProbability(currentValue, true) : 0;
-  const probabilityLower = currentValue !== null ? calculateWinProbability(currentValue, false) : 0;
+  const handleSpecialAction = useCallback((action: SpecialAction) => {
+    if (action.cost > gameState.score) return;
+    
+    const actionResult = action.execute(gameState);
+    updateGameState(actionResult);
+  }, [gameState, updateGameState]);
 
-  // Start screen
+  // Tutorial handlers
+  const handleTutorial = useCallback((variant: GameVariant) => {
+    setTutorialVariant(variant);
+    setShowTutorial(true);
+  }, []);
+
+  const closeTutorial = useCallback(() => {
+    setShowTutorial(false);
+    setTutorialVariant(null);
+  }, []);
+
+  const startGameFromTutorial = useCallback(() => {
+    if (tutorialVariant) {
+      setSelectedVariant(tutorialVariant);
+      closeTutorial();
+    }
+  }, [tutorialVariant, closeTutorial]);
+
+  // Probability calculation for current card
+  const currentProbability = gameState.currentCard ? {
+    higher: calculateWinProbability(getCardValue(gameState.currentCard.value), true),
+    lower: calculateWinProbability(getCardValue(gameState.currentCard.value), false)
+  } : { higher: 0, lower: 0 };
+
+  if (!hasMounted) {
+    return <div className={styles.loading}>Loading...</div>;
+  }
+
   if (!gameState.gameStarted) {
     return (
-      <div className={styles.container}>
-        <h1 className={`${styles.title} neon-text`}>🎲 Higher Lower Casino 🎲</h1>
-        
-        <div className={styles.statsContainer}>
-          <div className={styles.statCard}>
-            <div className={styles.statLabel}>Games Played</div>
-            <div className={styles.statValue}>{gameState.totalGames}</div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statLabel}>Best Score</div>
-            <div className={styles.statValue}>{gameState.bestScore}</div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statLabel}>Current Balance</div>
-            <div className={styles.statValue}>{balance}</div>
-          </div>
-        </div>
-
-        <div className={styles.controlsContainer}>
-          <button 
-            onClick={startGame} 
-            className={`${styles.button} ${styles.restartButton}`}
-            disabled={balance < 100}
-          >
-            {balance < 100 ? "Insufficient Funds" : "🎰 Start Game (-100)"}
-          </button>
-        </div>
-      </div>
+      <>
+        <VariantSelector
+          onSelectVariant={(variant) => {
+            setSelectedVariant(variant);
+            startGame();
+          }}
+          onTutorial={handleTutorial}
+        />
+        {showTutorial && (
+          <Tutorial
+            variant={tutorialVariant ? tutorialVariant : undefined}
+            onClose={closeTutorial}
+            onStartGame={startGameFromTutorial}
+          />
+        )}
+      </>
     );
   }
 
-  // Loading screen
-  if (gameState.loading) {
-    return (
-      <div className={styles.container}>
-        <h1 className={styles.title}>Loading...</h1>
-        <div className={styles.loadingSpinner}></div>
-      </div>
-    );
-  }
+  return (
+    <div className={styles.gameContainer}>
+      <div className={styles.gameContent}>
+        {/* Game Sidebar */}
+        <div className={styles.gameSidebar}>
+          {/* Variant Info */}
+          <div className={styles.sidebarSection}>
+            <h2 className={styles.variantTitle}>
+              {selectedVariant?.icon} {selectedVariant?.name}
+            </h2>
+            <button 
+              onClick={() => selectedVariant && handleTutorial(selectedVariant)}
+              className={styles.tutorialLink}
+            >
+              📚 View Tutorial
+            </button>
+          </div>
 
-  // Game over screen
-  if (gameState.gameOver) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.gameOverContainer}>
-          <h2 className={styles.gameOverTitle}>Game Over!</h2>
-          
-          {gameState.lastRoundCard && (
-            <div className={styles.cardContainer}>
-              <h3>The next card was:</h3>
-              <div className={styles.cardWrapper}>
-                <img 
-                  className={styles.cardImage} 
-                  src={gameState.lastRoundCard.image} 
-                  alt={formatCardName(gameState.lastRoundCard)} 
-                />
+          {/* Game Stats */}
+          <div className={styles.sidebarSection}>
+            <h3 className={styles.sectionTitle}>📊 Game Stats</h3>
+            <div className={styles.statsGrid}>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>Score</span>
+                <span className={styles.statValue}>{gameState.score}</span>
               </div>
-              <div className={styles.cardName}>{formatCardName(gameState.lastRoundCard)}</div>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>Streak</span>
+                <span className={styles.statValue}>{gameState.streak}</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>Multiplier</span>
+                <span className={styles.statValue}>{gameState.multiplier.toFixed(1)}x</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>Balance</span>
+                <span className={styles.statValue}>{balance}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Probability Display */}
+          {gameState.currentCard && (
+            <div className={styles.sidebarSection}>
+              <h3 className={styles.sectionTitle}>🎯 Probabilities</h3>
+              <div className={styles.probabilityGrid}>
+                <div className={styles.probItem}>
+                  <span className={styles.probLabel}>Higher</span>
+                  <span className={styles.probValue}>{currentProbability.higher}%</span>
+                </div>
+                <div className={styles.probItem}>
+                  <span className={styles.probLabel}>Lower</span>
+                  <span className={styles.probValue}>{currentProbability.lower}%</span>
+                </div>
+              </div>
             </div>
           )}
-          
-          <div className={styles.finalScore}>{gameState.score}</div>
-          <p>Streak: {gameState.streak} cards</p>
-          
-          <div className={styles.controlsContainer}>
-            <button 
-              onClick={startGame} 
-              className={`${styles.button} ${styles.restartButton}`}
-              disabled={balance < 100}
-            >
-              {balance < 100 ? "Insufficient Funds" : "🔄 Play Again (-100)"}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
-  // Victory screen
-  if (gameState.gameWon) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.gameWonContainer}>
-          <h2 className={styles.gameWonTitle}>🎉 Congratulations! 🎉</h2>
-          <p>You successfully cashed out!</p>
-          <div className={styles.finalScore}>{gameState.score}</div>
-          <p>Streak: {gameState.streak} cards</p>
-          
-          <div className={styles.controlsContainer}>
-            <button 
-              onClick={startGame} 
-              className={`${styles.button} ${styles.restartButton}`}
-              disabled={balance < 100}
-            >
-              {balance < 100 ? "Insufficient Funds" : "🎰 Play Again (-100)"}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Main game screen
-  return (
-    <div className={styles.container}>
-      <div className={styles.gameBoard}>
-        <h1 className={styles.title}>Higher Lower Casino</h1>
-        
-        <div className={styles.statsContainer}>
-          <div className={styles.statCard}>
-            <div className={styles.statLabel}>Current Score</div>
-            <div className={styles.statValue}>{gameState.score}</div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statLabel}>Streak</div>
-            <div className={styles.statValue}>{gameState.streak}</div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statLabel}>Balance</div>
-            <div className={styles.statValue}>{balance}</div>
-          </div>
-        </div>
-
-        {gameState.currentCard && (
-          <div className={styles.cardContainer}>
-            <h3>Current Card:</h3>
-            <div className={styles.cardWrapper}>
-              <img 
-                className={styles.cardImage} 
-                src={gameState.currentCard.image} 
-                alt={formatCardName(gameState.currentCard)} 
-              />
+          {/* Special Mode Indicator */}
+          {gameState.specialMode && (
+            <div className={styles.sidebarSection}>
+              <div className={styles.specialModeIndicator}>
+                <h4>🔥 Special Mode Active</h4>
+                <p>{gameState.specialMode}</p>
+              </div>
             </div>
-            <div className={styles.cardName}>{formatCardName(gameState.currentCard)}</div>
+          )}
+
+
+
+        </div>
+
+        {/* Main Game Area */}
+        <div className={styles.gameMain}>
+          <div className={styles.cardDisplay}>
+            {gameState.loading ? (
+              <div className={styles.loadingSpinner}>
+                <div className={styles.spinner}></div>
+                <p>Drawing card...</p>
+              </div>
+            ) : gameState.currentCard ? (
+              <div className={styles.cardContainer}>
+                <div className={styles.cardWrapper}>
+                  <img
+                    src={gameState.currentCard.image}
+                    alt={formatCardName(gameState.currentCard)}
+                    className={styles.cardImage}
+                  />
+                  <h3 className={styles.cardName}>
+                    {formatCardName(gameState.currentCard)}
+                  </h3>
+                </div>
+                
+                {gameState.lastRoundCard && (
+                  <div className={styles.lastRoundResult}>
+                    <div className={`${styles.resultIndicator} ${gameState.lastRoundCorrect ? styles.correct : styles.incorrect}`}>
+                      {gameState.lastRoundCorrect ? '✅ Correct!' : '❌ Wrong!'}
+                    </div>
+                    <div className={styles.lastCard}>
+                      <img
+                        src={gameState.lastRoundCard.image}
+                        alt={formatCardName(gameState.lastRoundCard)}
+                        className={styles.lastCardImage}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className={styles.noCard}>
+                <p>Ready to start!</p>
+              </div>
+            )}
+          </div>
+
+          {(gameState.gameOver || gameState.gameWon) && (
+            <div className={styles.gameOverOverlay}>
+              <div className={styles.gameOverContent}>
+                <h2 className={gameState.gameWon ? styles.gameWonTitle : styles.gameOverTitle}>
+                  {gameState.gameWon ? '🎉 Congratulations!' : '💔 Game Over'}
+                </h2>
+                <div className={styles.finalScore}>
+                  Final Score: <span>{gameState.score}</span>
+                </div>
+                {gameState.streak > 0 && (
+                  <div className={styles.finalStreak}>
+                    Best Streak: <span>{gameState.streak}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Game Footer with Action Buttons */}
+      <div className={styles.gameFooter}>
+        {/* Game Controls */}
+        {!gameState.gameOver && !gameState.gameWon && gameState.currentCard && (
+          <div className={styles.footerControls}>
+            <button
+              onClick={() => processGuess(true)}
+              className={`${styles.guessButton} ${styles.higherButton}`}
+              disabled={gameState.loading}
+            >
+              ⬆️ Higher
+            </button>
+            <button
+              onClick={() => processGuess(false)}
+              className={`${styles.guessButton} ${styles.lowerButton}`}
+              disabled={gameState.loading}
+            >
+              ⬇️ Lower
+            </button>
+            <button
+              onClick={cashOut}
+              className={styles.cashOutButton}
+              disabled={gameState.score === 0}
+            >
+              💰 Cash Out ({gameState.score})
+            </button>
+            
+            {/* Special Actions - Always visible */}
+            {getAllPossibleActions.map((action) => {
+              const availableAction = availableActions.find(a => a.id === action.id);
+              const isAvailable = availableAction && availableAction.available && availableAction.cost <= gameState.score;
+              
+              return (
+                <button
+                  key={action.id}
+                  onClick={() => isAvailable && handleSpecialAction(action)}
+                  disabled={!isAvailable || gameState.loading}
+                  className={`${styles.specialAction} ${styles.footerSpecialAction}`}
+                  title={action.description}
+                >
+                  <span className={styles.actionIcon}>{action.icon}</span>
+                  <span className={styles.actionName}>{action.name}</span>
+                  <span className={styles.actionCost}>({action.cost})</span>
+                </button>
+              );
+            })}
           </div>
         )}
 
-        <div className={styles.probabilityDisplay}>
-          <div className={styles.probabilityCard}>
-            <div className={styles.probabilityLabel}>Higher Odds</div>
-            <div className={styles.probabilityValue}>{probabilityHigher}%</div>
+        {/* Game Over Actions */}
+        {(gameState.gameOver || gameState.gameWon) && (
+          <div className={styles.footerControls}>
+            <button onClick={resetGame} className={styles.restartButton}>
+              🔄 Play Again
+            </button>
+            <button 
+              onClick={() => updateGameState({ gameStarted: false })}
+              className={styles.changeVariantButton}
+            >
+              🎰 Change Variant
+            </button>
           </div>
-          <div className={styles.probabilityCard}>
-            <div className={styles.probabilityLabel}>Lower Odds</div>
-            <div className={styles.probabilityValue}>{probabilityLower}%</div>
-          </div>
-        </div>
-
-        <div className={styles.controlsContainer}>
-          <button 
-            onClick={() => processGuess(true)} 
-            className={`${styles.button} ${styles.higherButton}`}
-          >
-            📈 Higher ({probabilityHigher}%)
-          </button>
-          <button 
-            onClick={() => processGuess(false)} 
-            className={`${styles.button} ${styles.lowerButton}`}
-          >
-            📉 Lower ({probabilityLower}%)
-          </button>
-          <button 
-            onClick={cashOut} 
-            className={`${styles.button} ${styles.cashOutButton}`}
-          >
-            💰 Cash Out ({gameState.score})
-          </button>
-        </div>
+        )}
       </div>
+
+      {showTutorial && tutorialVariant && (
+        <Tutorial
+          variant={tutorialVariant}
+          onClose={closeTutorial}
+          onStartGame={startGameFromTutorial}
+        />
+      )}
     </div>
   );
 }
 
-export default dynamic(() => Promise.resolve(GamePage), { ssr: false });
+export default GamePage;

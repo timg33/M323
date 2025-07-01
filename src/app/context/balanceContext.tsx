@@ -2,12 +2,26 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
+// Functional Programming: Pure types for transaction system
+interface Transaction {
+  id: string;
+  type: 'cash-in' | 'cash-out' | 'game-win' | 'game-loss' | 'entry-fee';
+  amount: number;
+  timestamp: Date;
+  description: string;
+}
+
 interface BalanceContextType {
   balance: number;
+  transactions: Transaction[];
   setBalance: (balance: number) => void;
   addToBalance: (amount: number) => void;
   subtractFromBalance: (amount: number) => boolean;
   resetBalance: () => void;
+  cashIn: (amount: number) => void;
+  cashOut: (amount: number) => boolean;
+  addTransaction: (type: Transaction['type'], amount: number, description: string) => void;
+  getTransactionHistory: (days?: number) => Transaction[];
 }
 
 // Functional Programming: Pure function to get default balance
@@ -36,6 +50,33 @@ const loadBalance = (): number => {
   return getDefaultBalance();
 };
 
+// Functional Programming: Pure functions for transaction management
+const saveTransactions = (transactions: Transaction[]): void => {
+  try {
+    localStorage.setItem('casinoTransactions', JSON.stringify(transactions));
+  } catch (error) {
+    console.warn('Failed to save transactions to localStorage:', error);
+  }
+};
+
+const loadTransactions = (): Transaction[] => {
+  try {
+    const saved = localStorage.getItem('casinoTransactions');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return parsed.map((t: any) => ({ ...t, timestamp: new Date(t.timestamp) }));
+    }
+  } catch (error) {
+    console.warn('Failed to load transactions from localStorage:', error);
+  }
+  return [];
+};
+
+// Functional Programming: Pure function to generate transaction ID
+const generateTransactionId = (): string => {
+  return `tx_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+};
+
 // Functional Programming: Higher-order function for balance operations
 const createBalanceUpdater = (operation: (current: number, amount: number) => number) => 
   (currentBalance: number, amount: number): number => {
@@ -49,20 +90,28 @@ const subtractOperation = (current: number, amount: number): number => current -
 
 const BalanceContext = createContext<BalanceContextType>({
   balance: getDefaultBalance(),
+  transactions: [],
   setBalance: () => {},
   addToBalance: () => {},
   subtractFromBalance: () => false,
   resetBalance: () => {},
+  cashIn: () => {},
+  cashOut: () => false,
+  addTransaction: () => {},
+  getTransactionHistory: () => [],
 });
 
 export const BalanceProvider = ({ children }: { children: ReactNode }) => {
   const [balance, setBalanceState] = useState<number>(getDefaultBalance());
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Functional Programming: Effect for loading initial balance
+  // Functional Programming: Effect for loading initial balance and transactions
   useEffect(() => {
     const initialBalance = loadBalance();
+    const initialTransactions = loadTransactions();
     setBalanceState(initialBalance);
+    setTransactions(initialTransactions);
     setIsLoaded(true);
   }, []);
 
@@ -72,6 +121,13 @@ export const BalanceProvider = ({ children }: { children: ReactNode }) => {
       saveBalance(balance);
     }
   }, [balance, isLoaded]);
+
+  // Functional Programming: Effect for saving transaction changes
+  useEffect(() => {
+    if (isLoaded) {
+      saveTransactions(transactions);
+    }
+  }, [transactions, isLoaded]);
 
   // Functional Programming: Pure function wrapper for setting balance
   const setBalance = (newBalance: number): void => {
@@ -104,12 +160,56 @@ export const BalanceProvider = ({ children }: { children: ReactNode }) => {
     setBalanceState(defaultBalance);
   };
 
+  // Functional Programming: Pure function to add transaction
+  const addTransaction = (type: Transaction['type'], amount: number, description: string): void => {
+    const newTransaction: Transaction = {
+      id: generateTransactionId(),
+      type,
+      amount,
+      timestamp: new Date(),
+      description
+    };
+    setTransactions(prev => [newTransaction, ...prev]);
+  };
+
+  // Functional Programming: Cash in method with transaction tracking
+  const cashIn = (amount: number): void => {
+    const positiveAmount = Math.abs(amount);
+    addToBalance(positiveAmount);
+    addTransaction('cash-in', positiveAmount, `Cash In: $${positiveAmount.toLocaleString()}`);
+  };
+
+  // Functional Programming: Cash out method with transaction tracking
+  const cashOut = (amount: number): boolean => {
+    const positiveAmount = Math.abs(amount);
+    if (subtractFromBalance(positiveAmount)) {
+      addTransaction('cash-out', positiveAmount, `Cash Out: $${positiveAmount.toLocaleString()}`);
+      return true;
+    }
+    return false;
+  };
+
+  // Functional Programming: Pure function to filter transactions by date
+  const getTransactionHistory = (days?: number): Transaction[] => {
+    if (!days) return transactions;
+    
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    
+    return transactions.filter(t => t.timestamp >= cutoffDate);
+  };
+
   const contextValue: BalanceContextType = {
     balance,
+    transactions,
     setBalance,
     addToBalance,
     subtractFromBalance,
     resetBalance,
+    cashIn,
+    cashOut,
+    addTransaction,
+    getTransactionHistory,
   };
 
   return (

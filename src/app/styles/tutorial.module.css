@@ -1,0 +1,557 @@
+/* Tutorial Component Styles */
+
+.tutorialOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.tutorialModal {
+  background: linear-gradient(135deg, 
+    var(--casino-bg-primary) 0%, 
+    var(--casino-surface) 100%);
+  border: 2px solid var(--casino-gold);
+  border-radius: 20px;
+  max-width: 95vw;
+  max-height: 95vh;
+  width: 900px;
+  height: 95vh;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(255, 193, 7, 0.2);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.4s ease-out;
+}
+
+.tutorialHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, 
+    rgba(255, 193, 7, 0.1) 0%, 
+    rgba(255, 193, 7, 0.05) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.headerContent {
+  flex: 1;
+}
+
+.tutorialTitle {
+  font-family: 'Orbitron', monospace;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--casino-gold);
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+.tutorialDescription {
+  color: var(--casino-silver);
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.closeButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  color: var(--casino-silver);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  background: var(--casino-red);
+  color: white;
+  transform: scale(1.1);
+}
+
+.tabNavigation {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.tabButton {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--casino-silver);
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tabButton::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--casino-gold);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.tabButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.tabButton.active {
+  color: var(--casino-gold);
+}
+
+.tabButton.active::after {
+  transform: scaleX(1);
+}
+
+.tutorialContent {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tutorialContent::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tutorialContent::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.tutorialContent::-webkit-scrollbar-thumb {
+  background: var(--casino-gold);
+  border-radius: 4px;
+}
+
+/* Step Content */
+.stepProgress {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stepDot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: var(--casino-silver);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepDot:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.stepDot.active {
+  background: var(--casino-gold);
+  color: var(--casino-dark);
+  border-color: var(--casino-gold);
+  box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+}
+
+.stepDot.completed {
+  background: var(--casino-green);
+  color: white;
+  border-color: var(--casino-green);
+}
+
+.stepContent {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.stepVisual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stepIcon {
+  font-size: 4rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.stepNumber {
+  color: var(--casino-gold);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stepTitle {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--casino-gold);
+  margin: 0 0 1rem 0;
+  text-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+}
+
+.stepDescription {
+  color: var(--casino-silver);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.stepTip {
+  background: linear-gradient(135deg, 
+    rgba(0, 255, 255, 0.1) 0%, 
+    rgba(0, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 15px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.tipIcon {
+  font-size: 1.2rem;
+  color: var(--neon-blue);
+}
+
+.tipText {
+  color: var(--casino-silver);
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+.stepNavigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.navButton {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.navButton:hover:not(:disabled) {
+  background: var(--casino-gold);
+  color: var(--casino-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+.navButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.stepCounter {
+  color: var(--casino-silver);
+  font-weight: 500;
+}
+
+/* List Content */
+.listContent {
+  text-align: left;
+}
+
+.listTitle {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--casino-gold);
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+}
+
+.strategiesList,
+.warningsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.strategyItem,
+.warningItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  margin-bottom: 0.8rem;
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+}
+
+.strategyItem {
+  border-left-color: var(--casino-green);
+}
+
+.warningItem {
+  border-left-color: var(--casino-red);
+}
+
+.strategyItem:hover,
+.warningItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+}
+
+.strategyIcon,
+.warningIcon {
+  font-size: 1.2rem;
+  min-width: 1.2rem;
+  margin-top: 0.1rem;
+}
+
+.strategyIcon {
+  color: var(--casino-green);
+}
+
+.warningIcon {
+  color: var(--casino-red);
+}
+
+.strategyItem,
+.warningItem {
+  color: var(--casino-silver);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Footer */
+.tutorialFooter {
+  padding: 1.5rem 2rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, var(--casino-gold) 0%, #f39c12 100%);
+  color: var(--casino-dark);
+  border: none;
+  border-radius: 15px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+  background: linear-gradient(135deg, #f39c12 0%, var(--casino-gold) 100%);
+}
+
+.secondaryButton {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--casino-silver);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.secondaryButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Error State */
+.errorState {
+  text-align: center;
+  padding: 3rem;
+}
+
+.errorIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.errorState h2 {
+  color: var(--casino-red);
+  font-family: 'Orbitron', monospace;
+  margin-bottom: 1rem;
+}
+
+.errorState p {
+  color: var(--casino-silver);
+  margin-bottom: 2rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tutorialModal {
+    width: 98vw;
+    height: 98vh;
+    max-height: 98vh;
+  }
+  
+  .tutorialHeader {
+    padding: 1rem;
+  }
+  
+  .tutorialTitle {
+    font-size: 1.3rem;
+  }
+  
+  .tutorialDescription {
+    font-size: 0.8rem;
+  }
+  
+  .tutorialContent {
+    padding: 1rem;
+    overflow-y: hidden;
+  }
+  
+  .stepProgress {
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .stepDot {
+    width: 30px;
+    height: 30px;
+    font-size: 0.7rem;
+  }
+  
+  .stepIcon {
+    font-size: 2rem;
+  }
+  
+  .stepTitle {
+    font-size: 1.1rem;
+  }
+  
+  .stepDescription {
+    font-size: 0.8rem;
+  }
+  
+  .tutorialFooter {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    text-align: center;
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabButton {
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .stepProgress {
+    flex-wrap: wrap;
+  }
+  
+  .stepNavigation {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .navButton {
+    width: 100%;
+  }
+} 

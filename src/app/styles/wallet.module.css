@@ -1,0 +1,451 @@
+/* Casino Wallet Page Styles */
+
+.walletContainer {
+  min-height: 100vh;
+  background: var(--casino-bg-primary);
+  padding: 2rem;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 193, 7, 0.1) 0%, transparent 50%),
+    linear-gradient(45deg, transparent 49%, rgba(120, 119, 198, 0.02) 50%, transparent 51%);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 3rem;
+  gap: 2rem;
+}
+
+.titleSection {
+  flex: 1;
+}
+
+.title {
+  font-family: 'Orbitron', monospace;
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--casino-gold);
+  text-shadow: 
+    0 0 10px rgba(255, 193, 7, 0.5),
+    0 0 20px rgba(255, 193, 7, 0.3),
+    0 0 30px rgba(255, 193, 7, 0.2);
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.titleIcon {
+  font-size: 2.5rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.subtitle {
+  color: var(--casino-silver);
+  font-size: 1.2rem;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.balanceCard {
+  background: linear-gradient(135deg, 
+    rgba(255, 193, 7, 0.15) 0%, 
+    rgba(255, 193, 7, 0.05) 100%);
+  border: 2px solid var(--casino-gold);
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  min-width: 300px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.balanceLabel {
+  color: var(--casino-silver);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+}
+
+.balanceAmount {
+  font-family: 'Orbitron', monospace;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--casino-gold);
+  text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+  margin-bottom: 0.5rem;
+}
+
+.balanceSubtext {
+  color: var(--casino-silver);
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.notification {
+  background: var(--casino-green);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 500;
+  animation: slideIn 0.3s ease-out;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.notification.error {
+  background: var(--casino-red);
+}
+
+.notification.success {
+  background: var(--casino-green);
+}
+
+.actionsSection {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  backdrop-filter: blur(10px);
+}
+
+.sectionTitle {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.8rem;
+  color: var(--casino-gold);
+  margin: 0 0 2rem 0;
+  text-align: center;
+}
+
+.amountInput {
+  margin-bottom: 2rem;
+}
+
+.inputLabel {
+  display: block;
+  color: var(--casino-silver);
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.amountField {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  color: white;
+  font-size: 1.2rem;
+  font-family: 'Orbitron', monospace;
+  transition: all 0.3s ease;
+}
+
+.amountField:focus {
+  outline: none;
+  border-color: var(--casino-gold);
+  box-shadow: 0 0 20px rgba(255, 193, 7, 0.3);
+}
+
+.amountField::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.quickAmounts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.quickLabel {
+  color: var(--casino-silver);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.quickAmount {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: var(--casino-silver);
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quickAmount:hover {
+  background: var(--casino-gold);
+  color: var(--casino-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+.actionButtons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.05) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.actionButton:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.actionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionButton.cash-in:hover:not(:disabled) {
+  border-color: var(--casino-green);
+  box-shadow: 0 10px 30px rgba(var(--casino-green-rgb), 0.3);
+}
+
+.actionButton.cash-out:hover:not(:disabled) {
+  border-color: var(--casino-red);
+  box-shadow: 0 10px 30px rgba(var(--casino-red-rgb), 0.3);
+}
+
+.actionIcon {
+  font-size: 2rem;
+  min-width: 2rem;
+}
+
+.actionContent {
+  flex: 1;
+  text-align: left;
+}
+
+.actionName {
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-bottom: 0.3rem;
+}
+
+.actionDescription {
+  color: var(--casino-silver);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.historySection {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.historyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.periodSelector {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  padding: 0.3rem;
+}
+
+.periodButton {
+  background: transparent;
+  border: none;
+  color: var(--casino-silver);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.periodButton.active {
+  background: var(--casino-gold);
+  color: var(--casino-dark);
+}
+
+.periodButton:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.transactionsList {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--casino-gold) transparent;
+}
+
+.transactionsList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.transactionsList::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.transactionsList::-webkit-scrollbar-thumb {
+  background: var(--casino-gold);
+  border-radius: 4px;
+}
+
+.transactionItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.transactionItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+}
+
+.transactionIcon {
+  font-size: 1.5rem;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.transactionDetails {
+  flex: 1;
+}
+
+.transactionDescription {
+  color: white;
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+}
+
+.transactionDate {
+  color: var(--casino-silver);
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.transactionAmount {
+  font-family: 'Orbitron', monospace;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.transactionAmount.positive {
+  color: var(--casino-green);
+}
+
+.transactionAmount.negative {
+  color: var(--casino-red);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: var(--casino-silver);
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.emptyDescription {
+  opacity: 0.7;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .walletContainer {
+    padding: 1rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .balanceCard {
+    min-width: auto;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .actionButtons {
+    grid-template-columns: 1fr;
+  }
+  
+  .historyHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .periodSelector {
+    justify-content: center;
+  }
+  
+  .quickAmounts {
+    justify-content: center;
+  }
+} 

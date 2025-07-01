@@ -25,7 +25,9 @@ const createNavItem = (href: string, label: string, icon?: string) => ({
 const navigationItems = [
   createNavItem("/", "Home", "🏠"),
   createNavItem("/game", "Game", "🎮"),
-  createNavItem("/highscores", "Leaderboard", "🏆")
+  createNavItem("/highscores", "Leaderboard", "🏆"),
+  createNavItem("/wallet", "Wallet", "🏦"),
+  createNavItem("/analysis", "Analysis", "📊")
 ];
 
 export default function Menu() {
@@ -50,9 +52,11 @@ export default function Menu() {
       </div>
       
       <div className={styles.balanceSection}>
-        <div className={styles.balance}>
-          {formatBalance(balance)}
-        </div>
+        <Link href="/wallet" className={styles.balanceLink}>
+          <div className={styles.balance}>
+            💰 {formatBalance(balance)}
+          </div>
+        </Link>
       </div>
     </nav>
   );
