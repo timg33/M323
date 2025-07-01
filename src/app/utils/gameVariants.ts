@@ -126,10 +126,10 @@ const doubleOrNothingVariant: GameVariant = {
     const basePoints = doubleOrNothingVariant.calculateReward(probability, newStreak, gameState.multiplier);
     const finalPoints = gameState.doubleOrNothingActive ? basePoints * 2 : basePoints;
     
-    // Double or Nothing has aggressive multiplier growth but higher risk
+    // Double or Nothing: Normal multiplier growth (every 2 streaks) - doubling only happens via special action
     let newMultiplier = gameState.multiplier;
     if (newStreak >= 2 && newStreak % 2 === 0) { // Every 2 streaks
-      newMultiplier = Math.min(gameState.multiplier + 0.3, 4.0); // Max 4x but faster growth
+      newMultiplier = Math.min(gameState.multiplier + 0.3, 8.0); // Max 8x with moderate growth
     }
     
     return {
@@ -148,13 +148,14 @@ const doubleOrNothingVariant: GameVariant = {
     return [{
       id: 'double-or-nothing',
       name: '💎 Double or Nothing',
-      description: `Risk ALL ${gameState.score} points! Win = DOUBLE points, Lose = LOSE EVERYTHING!`,
+      description: `Risk ALL ${gameState.score} points! Win = DOUBLE points + DOUBLE multiplier, Lose = LOSE EVERYTHING!`,
       icon: '💎',
       cost: 0,
       available: !gameState.doubleOrNothingActive, // Available only when not active
       execute: (state: GameState) => ({ 
         doubleOrNothingActive: true,
-        specialMode: 'double-or-nothing' // Add visual indicator
+        specialMode: 'double-or-nothing', // Add visual indicator
+        multiplier: Math.min(state.multiplier * 2, 8.0) // DOUBLE the multiplier when activated!
       })
     }];
   }
@@ -168,7 +169,7 @@ const streakMasterVariant: GameVariant = {
   icon: '⚡',
   entryCost: 150,
   difficulty: 'Medium',
-  features: ['Exponential Multipliers', 'Streak Focus', 'Bonus Actions'],
+  features: ['Exponential Multipliers', 'Streak Focus', 'Multiplier Boosts'],
   maxMultiplier: 10,
   
   // Functional Programming: Specialized multiplier calculation for streak master
@@ -189,40 +190,29 @@ const streakMasterVariant: GameVariant = {
   // Functional Programming: Pure function with streak-focused processing
   processGuess: (gameState: GameState, isCorrect: boolean, probability: number): Partial<GameState> => {
     if (!isCorrect) {
-      // Check if streak shield is active - it protects the streak!
-      if (gameState.specialMode === 'streak-shield') {
-        return { 
-          specialMode: undefined, // Remove streak shield after use
-          // Keep 75% of score and preserve streak when shield is used
-          score: Math.floor(gameState.score * 0.75)
-          // streak stays the same, game continues!
-        };
-      } else {
-        return { 
-          gameOver: true,
-          // Streak Master keeps 25% of score on loss (softer penalty)
-          score: Math.floor(gameState.score * 0.25),
-          multiplier: 1 // Reset multiplier on game over
-        };
-      }
+      return { 
+        gameOver: true,
+        // Streak Master keeps 25% of score on loss (softer penalty)
+        score: Math.floor(gameState.score * 0.25),
+        multiplier: 1 // Reset multiplier on game over
+      };
     }
     
     const newStreak = gameState.streak + 1;
     const points = streakMasterVariant.calculateReward(probability, newStreak, gameState.multiplier);
     
-    // Handle multiplier boost duration
-    let newMultiplier = gameState.multiplier;
+    // Streak Master: ALWAYS increase multiplier by 0.1x every correct guess!
+    let newMultiplier = Math.min(gameState.multiplier + 0.1, 10.0); // Increase every time, max 10x
     let newSpecialMode = gameState.specialMode;
     
+    // Handle multiplier boost duration separately (doesn't interfere with base growth)
     if (gameState.specialMode === 'multiplier-boost') {
       // Decrease boost duration (stored in timeLeft or create a counter)
       const boostRounds = gameState.timeLeft || 3;
       if (boostRounds <= 1) {
         newSpecialMode = undefined; // Boost expires
-        newMultiplier = Math.max(1, gameState.multiplier - 0.5); // Remove boost
+        newMultiplier = Math.max(1, newMultiplier - 0.5); // Remove boost but keep base growth
       }
-    } else if (newStreak >= 5) {
-      newMultiplier = Math.min(gameState.multiplier + 0.1, 3);
     }
     
     return {
@@ -238,34 +228,18 @@ const streakMasterVariant: GameVariant = {
   getSpecialActions: (gameState: GameState): SpecialAction[] => {
     const actions: SpecialAction[] = [];
     
-    // Streak Shield - Protect from losing streak (only if not already active)
-    if (gameState.streak >= 3 && gameState.score >= 50 && gameState.specialMode !== 'streak-shield') {
-      actions.push({
-        id: 'streak-shield',
-        name: '🛡️ Streak Shield',
-        description: 'Survive one wrong guess without losing your streak! Keeps 75% of score.',
-        icon: '🛡️',
-        cost: 50,
-        available: true,
-        execute: (state: GameState) => ({ 
-          score: state.score - 50,
-          specialMode: 'streak-shield'
-        })
-      });
-    }
-    
     // Multiplier Boost (only if not already active)
-    if (gameState.streak >= 5 && gameState.multiplier < 2.5 && gameState.specialMode !== 'multiplier-boost') {
+    if (gameState.streak >= 5 && gameState.multiplier < 8.0 && gameState.specialMode !== 'multiplier-boost') {
       actions.push({
         id: 'multiplier-boost',
         name: '🚀 Multiplier Boost',
         description: 'Add +0.5x multiplier for the next 3 correct guesses.',
         icon: '🚀',
-        cost: 100,
+        cost: 50,
         available: true,
         execute: (state: GameState) => ({ 
-          score: state.score - 100,
-          multiplier: Math.min(state.multiplier + 0.5, 3),
+          score: state.score - 50,
+          multiplier: Math.min(state.multiplier + 0.5, 10),
           specialMode: 'multiplier-boost',
           timeLeft: 3
         })

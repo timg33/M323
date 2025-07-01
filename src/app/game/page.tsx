@@ -310,9 +310,6 @@ function GamePage() {
                 {gameState.specialMode === 'double-or-nothing' && (
                   <p>💎 DOUBLE OR NOTHING: Next guess wins DOUBLE or loses ALL!</p>
                 )}
-                {gameState.specialMode === 'streak-shield' && (
-                  <p>🛡️ STREAK SHIELD: Protected from next wrong guess!</p>
-                )}
                 {gameState.specialMode === 'multiplier-boost' && (
                   <p>🚀 MULTIPLIER BOOST: +0.5x for {gameState.timeLeft || 0} more guess{(gameState.timeLeft || 0) !== 1 ? 'es' : ''}!</p>
                 )}
@@ -465,7 +462,6 @@ function GamePage() {
               // Check if this special action is currently active
               const isActive = (
                 (action.id === 'double-or-nothing' && gameState.doubleOrNothingActive) ||
-                (action.id === 'streak-shield' && gameState.specialMode === 'streak-shield') ||
                 (action.id === 'multiplier-boost' && gameState.specialMode === 'multiplier-boost')
               );
               

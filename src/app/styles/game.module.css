@@ -694,7 +694,7 @@
 }
 
 .gameOverContent {
-  text-align: center;
+    text-align: center;
   padding: 2rem;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 15px;
@@ -978,5 +978,5 @@
   .actionName {
     font-size: 0.9rem;
   }
-}
+  }
   
