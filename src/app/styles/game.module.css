@@ -144,6 +144,96 @@
   text-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
 }
 
+/* Multiplier Value Enhanced Styling */
+.multiplierValue {
+  transition: all 0.3s ease;
+}
+
+.multiplierValue[data-multiplier="1"] {
+  color: var(--casino-text);
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.multiplierValue[data-multiplier="2"] {
+  color: var(--casino-gold);
+  text-shadow: 0 0 12px rgba(255, 193, 7, 0.8);
+  animation: glow-gold 2s ease-in-out infinite;
+}
+
+.multiplierValue[data-multiplier="3"] {
+  color: var(--neon-blue);
+  text-shadow: 0 0 15px rgba(0, 191, 255, 0.9);
+  animation: glow-blue 1.5s ease-in-out infinite;
+}
+
+.multiplierValue[data-multiplier="4"],
+.multiplierValue[data-multiplier="5"] {
+  color: var(--neon-pink);
+  text-shadow: 0 0 20px rgba(255, 20, 147, 1);
+  animation: glow-pink 1s ease-in-out infinite;
+  transform: scale(1.1);
+}
+
+.multiplierValue[data-multiplier="6"],
+.multiplierValue[data-multiplier="7"],
+.multiplierValue[data-multiplier="8"],
+.multiplierValue[data-multiplier="9"],
+.multiplierValue[data-multiplier="10"] {
+  background: linear-gradient(45deg, var(--casino-gold), var(--neon-pink), var(--neon-blue));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbow-glow 0.8s ease-in-out infinite, scale-pulse 1s ease-in-out infinite;
+  transform: scale(1.2);
+}
+
+/* Multiplier Glow Animations */
+@keyframes glow-gold {
+  0%, 100% { 
+    text-shadow: 0 0 12px rgba(255, 193, 7, 0.8);
+    transform: scale(1);
+  }
+  50% { 
+    text-shadow: 0 0 20px rgba(255, 193, 7, 1), 0 0 30px rgba(255, 193, 7, 0.5);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes glow-blue {
+  0%, 100% { 
+    text-shadow: 0 0 15px rgba(0, 191, 255, 0.9);
+    transform: scale(1);
+  }
+  50% { 
+    text-shadow: 0 0 25px rgba(0, 191, 255, 1), 0 0 35px rgba(0, 191, 255, 0.6);
+    transform: scale(1.08);
+  }
+}
+
+@keyframes glow-pink {
+  0%, 100% { 
+    text-shadow: 0 0 20px rgba(255, 20, 147, 1);
+    transform: scale(1.1);
+  }
+  50% { 
+    text-shadow: 0 0 30px rgba(255, 20, 147, 1), 0 0 40px rgba(255, 20, 147, 0.7);
+    transform: scale(1.15);
+  }
+}
+
+@keyframes rainbow-glow {
+  0% { filter: hue-rotate(0deg) brightness(1.2); }
+  25% { filter: hue-rotate(90deg) brightness(1.4); }
+  50% { filter: hue-rotate(180deg) brightness(1.6); }
+  75% { filter: hue-rotate(270deg) brightness(1.4); }
+  100% { filter: hue-rotate(360deg) brightness(1.2); }
+}
+
+@keyframes scale-pulse {
+  0%, 100% { transform: scale(1.2); }
+  50% { transform: scale(1.3); }
+}
+
 .probabilityGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -298,8 +388,31 @@
 .footerSpecialAction {
   padding: 0.8rem 1rem !important;
   font-size: 0.9rem !important;
-  min-width: 140px;
-  flex: 0 0 auto;
+}
+
+/* Active Special Action State */
+.footerSpecialAction.active {
+  background: linear-gradient(135deg, 
+    var(--neon-pink) 0%, 
+    rgba(255, 20, 147, 0.8) 100%) !important;
+  border-color: var(--neon-pink) !important;
+  color: white !important;
+  animation: pulse 1s ease-in-out infinite !important;
+  box-shadow: 
+    0 0 25px rgba(255, 20, 147, 0.8),
+    0 8px 25px rgba(255, 215, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3) !important;
+}
+
+.footerSpecialAction.active .actionName {
+  color: white !important;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8) !important;
+}
+
+.footerSpecialAction.active .actionCost {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
 }
 
 .footerSpecialAction .actionIcon {
@@ -812,10 +925,17 @@
 .footerControls {
   display: flex;
   gap: 1rem;
-  justify-content: center;
+  justify-content: space-between;
   flex-wrap: wrap;
-  max-width: 900px;
   width: 100%;
+  align-items: center;
+}
+
+/* When there are many buttons, distribute them evenly */
+.footerControls > * {
+  flex: 1;
+  min-width: 120px;
+  max-width: 200px;
 }
 
 /* Mobile responsive for footer */
@@ -835,19 +955,15 @@
   .footerControls {
     flex-direction: column;
     gap: 0.8rem;
+    justify-content: center;
   }
   
-  .footerControls .guessButton,
-  .footerControls .cashOutButton,
-  .footerControls .restartButton,
-  .footerControls .changeVariantButton,
-  .footerControls .footerSpecialAction {
+  .footerControls > * {
+    flex: none;
     width: 100%;
+    min-width: auto;
+    max-width: none;
     margin: 0;
-  }
-  
-  .footerSpecialAction {
-    min-width: auto !important;
   }
   
   .specialAction {

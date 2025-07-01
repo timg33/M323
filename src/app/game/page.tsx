@@ -300,18 +300,25 @@ function GamePage() {
       <div className={styles.gameContent}>
         {/* Game Sidebar */}
         <div className={styles.gameSidebar}>
-          {/* Variant Info */}
-          <div className={styles.sidebarSection}>
-            <h2 className={styles.variantTitle}>
-              {selectedVariant?.icon} {selectedVariant?.name}
-            </h2>
-            <button 
-              onClick={() => selectedVariant && handleTutorial(selectedVariant)}
-              className={styles.tutorialLink}
-            >
-              📚 View Tutorial
-            </button>
-          </div>
+
+
+          {/* Special Mode Indicator */}
+          {gameState.specialMode && (
+            <div className={styles.sidebarSection}>
+              <div className={styles.specialModeIndicator}>
+                <h4>🔥 Special Mode Active</h4>
+                {gameState.specialMode === 'double-or-nothing' && (
+                  <p>💎 DOUBLE OR NOTHING: Next guess wins DOUBLE or loses ALL!</p>
+                )}
+                {gameState.specialMode === 'streak-shield' && (
+                  <p>🛡️ STREAK SHIELD: Protected from next wrong guess!</p>
+                )}
+                {gameState.specialMode === 'multiplier-boost' && (
+                  <p>🚀 MULTIPLIER BOOST: +0.5x for {gameState.timeLeft || 0} more guess{(gameState.timeLeft || 0) !== 1 ? 'es' : ''}!</p>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Game Stats */}
           <div className={styles.sidebarSection}>
@@ -327,7 +334,12 @@ function GamePage() {
               </div>
               <div className={styles.statItem}>
                 <span className={styles.statLabel}>Multiplier</span>
-                <span className={styles.statValue}>{gameState.multiplier.toFixed(1)}x</span>
+                <span 
+                  className={`${styles.statValue} ${styles.multiplierValue}`}
+                  data-multiplier={Math.floor(gameState.multiplier)}
+                >
+                  {gameState.multiplier.toFixed(1)}x
+                </span>
               </div>
               <div className={styles.statItem}>
                 <span className={styles.statLabel}>Balance</span>
@@ -352,18 +364,6 @@ function GamePage() {
               </div>
             </div>
           )}
-
-          {/* Special Mode Indicator */}
-          {gameState.specialMode && (
-            <div className={styles.sidebarSection}>
-              <div className={styles.specialModeIndicator}>
-                <h4>🔥 Special Mode Active</h4>
-                <p>{gameState.specialMode}</p>
-              </div>
-            </div>
-          )}
-
-
 
         </div>
 
@@ -462,17 +462,28 @@ function GamePage() {
               const availableAction = availableActions.find(a => a.id === action.id);
               const isAvailable = availableAction && availableAction.available && availableAction.cost <= gameState.score;
               
+              // Check if this special action is currently active
+              const isActive = (
+                (action.id === 'double-or-nothing' && gameState.doubleOrNothingActive) ||
+                (action.id === 'streak-shield' && gameState.specialMode === 'streak-shield') ||
+                (action.id === 'multiplier-boost' && gameState.specialMode === 'multiplier-boost')
+              );
+              
               return (
                 <button
                   key={action.id}
-                  onClick={() => isAvailable && handleSpecialAction(action)}
-                  disabled={!isAvailable || gameState.loading}
-                  className={`${styles.specialAction} ${styles.footerSpecialAction}`}
-                  title={action.description}
+                  onClick={() => isAvailable && !isActive && handleSpecialAction(action)}
+                  disabled={!isAvailable || gameState.loading || isActive}
+                  className={`${styles.specialAction} ${styles.footerSpecialAction} ${isActive ? styles.active : ''}`}
+                  title={isActive ? `ACTIVE: ${action.description}` : action.description}
                 >
                   <span className={styles.actionIcon}>{action.icon}</span>
-                  <span className={styles.actionName}>{action.name}</span>
-                  <span className={styles.actionCost}>({action.cost})</span>
+                  <span className={styles.actionName}>
+                    {isActive ? `ACTIVE` : action.name.replace(/^[💎🛡️🚀]\s*/, '')}
+                  </span>
+                  <span className={styles.actionCost}>
+                    {isActive ? (action.id === 'multiplier-boost' ? `${gameState.timeLeft || 0} left` : 'ACTIVE') : `(${action.cost})`}
+                  </span>
                 </button>
               );
             })}
