@@ -1,0 +1,465 @@
+.container {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: radial-gradient(ellipse at center, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
+  color: var(--casino-text);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 50px;
+  animation: slideIn 0.8s ease-out;
+}
+
+.title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 900;
+  margin-bottom: 15px;
+  background: linear-gradient(135deg, var(--casino-gold) 0%, #FFF 50%, var(--casino-gold) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 
+    0 0 20px rgba(255, 215, 0, 0.8),
+    0 0 40px rgba(255, 215, 0, 0.6);
+  animation: neonGlow 3s ease-in-out infinite alternate;
+}
+
+.subtitle {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.3rem;
+  color: var(--casino-text-muted);
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.statCard {
+  background: linear-gradient(135deg, var(--casino-card-bg) 0%, var(--casino-surface) 100%);
+  padding: 25px;
+  border-radius: 15px;
+  border: 2px solid var(--casino-border);
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  animation: slideIn 0.6s ease-out;
+}
+
+.statCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--casino-gold), var(--neon-blue), var(--casino-gold));
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.statCard:hover::before {
+  transform: translateX(100%);
+}
+
+.statCard:hover {
+  transform: translateY(-5px);
+  border-color: var(--casino-gold);
+  box-shadow: 
+    0 15px 30px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(255, 215, 0, 0.2);
+}
+
+.statIcon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.statValue {
+  font-family: 'Orbitron', monospace;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--casino-gold);
+  margin-bottom: 5px;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.statLabel {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.9rem;
+  color: var(--casino-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.filterButtons {
+  display: flex;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--casino-card-bg) 0%, var(--casino-surface) 100%);
+  padding: 5px;
+  border-radius: 25px;
+  border: 2px solid var(--casino-border);
+}
+
+.filterButton {
+  padding: 10px 20px;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--casino-text-muted);
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.filterButton:hover {
+  color: var(--casino-gold);
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.filterButton.active {
+  background: linear-gradient(135deg, var(--casino-gold) 0%, var(--casino-dark-gold) 100%);
+  color: var(--casino-dark-bg);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+.clearButton {
+  padding: 10px 20px;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--casino-red) 0%, #FF4500 100%);
+  color: white;
+  border: 2px solid var(--casino-red);
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.clearButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(220, 20, 60, 0.4);
+}
+
+.leaderboard {
+  max-width: 1000px;
+  margin: 0 auto;
+  animation: slideIn 0.8s ease-out;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, var(--casino-card-bg) 0%, var(--casino-surface) 100%);
+  border-radius: 20px;
+  border: 2px solid var(--casino-border);
+}
+
+.emptyState h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.8rem;
+  color: var(--casino-gold);
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+
+.emptyState p {
+  color: var(--casino-text-muted);
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+}
+
+.playButton {
+  display: inline-block;
+  padding: 15px 30px;
+  font-family: 'Orbitron', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--casino-gold) 0%, var(--casino-dark-gold) 100%);
+  color: var(--casino-dark-bg);
+  text-decoration: none;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+}
+
+.playButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+}
+
+.scoresList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.scoreEntry {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, var(--casino-card-bg) 0%, var(--casino-surface) 100%);
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid var(--casino-border);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.scoreEntry::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--casino-gold), var(--neon-blue), var(--casino-gold));
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.scoreEntry:hover::before {
+  transform: translateX(100%);
+}
+
+.scoreEntry:hover {
+  transform: translateY(-5px);
+  border-color: var(--casino-gold);
+  box-shadow: 
+    0 15px 30px rgba(0, 0, 0, 0.3),
+    0 0 25px rgba(255, 215, 0, 0.2);
+}
+
+.topThree {
+  border-color: var(--casino-gold);
+  box-shadow: 
+    0 5px 20px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(255, 215, 0, 0.1);
+}
+
+.rank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 20px;
+  min-width: 80px;
+}
+
+.medal {
+  font-size: 2rem;
+  margin-bottom: 5px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.position {
+  font-family: 'Orbitron', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--casino-gold);
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.playerInfo {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.playerName {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--casino-text);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.scoreDate {
+  font-size: 0.9rem;
+  color: var(--casino-text-muted);
+  font-style: italic;
+}
+
+.scoreValue {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--casino-gold);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  text-align: right;
+  min-width: 120px;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 50px;
+  flex-wrap: wrap;
+}
+
+.playAgainButton,
+.homeButton {
+  display: inline-block;
+  padding: 15px 30px;
+  font-family: 'Orbitron', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid;
+  min-width: 150px;
+  text-align: center;
+}
+
+.playAgainButton {
+  background: linear-gradient(135deg, var(--casino-green) 0%, #32CD32 100%);
+  color: white;
+  border-color: var(--casino-green);
+  box-shadow: 0 5px 20px rgba(15, 123, 15, 0.3);
+}
+
+.playAgainButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(15, 123, 15, 0.5);
+}
+
+.homeButton {
+  background: linear-gradient(135deg, var(--casino-surface) 0%, var(--casino-border) 100%);
+  color: var(--casino-text);
+  border-color: var(--casino-border);
+  box-shadow: 0 5px 20px rgba(68, 68, 68, 0.3);
+}
+
+.homeButton:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(135deg, var(--casino-gold) 0%, var(--casino-dark-gold) 100%);
+  color: var(--casino-dark-bg);
+  border-color: var(--casino-gold);
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+}
+
+.loadingSpinner {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  border: 4px solid var(--casino-border);
+  border-radius: 50%;
+  border-top-color: var(--casino-gold);
+  animation: spin 1s linear infinite;
+  margin: 40px auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 15px;
+  }
+  
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filterButtons {
+    justify-content: center;
+  }
+  
+  .scoreEntry {
+    padding: 15px;
+  }
+  
+  .rank {
+    margin-right: 15px;
+    min-width: 60px;
+  }
+  
+  .medal {
+    font-size: 1.5rem;
+  }
+  
+  .playerName {
+    font-size: 1.1rem;
+  }
+  
+  .scoreValue {
+    font-size: 1.4rem;
+    min-width: 100px;
+  }
+  
+  .actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .playAgainButton,
+  .homeButton {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .scoreEntry {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .rank,
+  .playerInfo {
+    margin-right: 0;
+  }
+  
+  .scoreValue {
+    text-align: center;
+  }
+} 

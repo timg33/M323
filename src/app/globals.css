@@ -1,33 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+:root {
+  --casino-gold: #FFD700;
+  --casino-dark-gold: #B8860B;
+  --casino-green: #0F7B0F;
+  --casino-red: #DC143C;
+  --casino-dark-bg: #0A0A0A;
+  --casino-card-bg: #1A1A1A;
+  --casino-surface: #2A2A2A;
+  --casino-text: #FFFFFF;
+  --casino-text-muted: #CCCCCC;
+  --casino-border: #444444;
+  --neon-blue: #00BFFF;
+  --neon-pink: #FF1493;
+  --shadow-glow: 0 0 20px rgba(255, 215, 0, 0.3);
+  --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
 html,
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f2f2f2;
-  color: #333;
+  font-family: 'Roboto', 'Arial', sans-serif;
+  background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 50%, #0A0A0A 100%);
+  background-attachment: fixed;
+  color: var(--casino-text);
   height: 100%;
+  overflow-x: hidden;
 }
 
 body {
   line-height: 1.6;
+  position: relative;
+}
+
+/* Casino-style background pattern */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(220, 20, 60, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 a {
   text-decoration: none;
   color: inherit;
+  transition: all 0.3s ease;
 }
 
 button {
   cursor: pointer;
   border: none;
   outline: none;
+  font-family: 'Orbitron', monospace;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Neon glow effect for buttons */
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+button:hover::before {
+  left: 100%;
 }
 
 img {
   max-width: 100%;
   display: block;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--casino-dark-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--casino-gold), var(--casino-dark-gold));
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--casino-dark-gold), var(--casino-gold));
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+@keyframes neonGlow {
+  0%, 100% { box-shadow: 0 0 20px var(--casino-gold), 0 0 40px var(--casino-gold), 0 0 60px var(--casino-gold); }
+  50% { box-shadow: 0 0 10px var(--casino-gold), 0 0 20px var(--casino-gold), 0 0 30px var(--casino-gold); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+/* Utility classes */
+.neon-text {
+  text-shadow: 
+    0 0 5px var(--casino-gold),
+    0 0 10px var(--casino-gold),
+    0 0 15px var(--casino-gold),
+    0 0 20px var(--casino-gold);
+}
+
+.slide-in {
+  animation: slideIn 0.6s ease-out;
+}
+
+.pulse {
+  animation: pulse 2s infinite;
 }

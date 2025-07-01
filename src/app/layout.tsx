@@ -15,8 +15,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Higher Lower",
-  description: "A fun guessing game",
+  title: "Higher Lower Casino | The Ultimate Card Prediction Game",
+  description: "Experience the thrill of Las Vegas from home! Predict card outcomes, calculate odds, and win big in our premium casino card game. Features real-time probability calculations, professional graphics, and competitive leaderboards.",
+  keywords: "casino game, card prediction, higher lower, gambling game, probability game, casino cards, leaderboard, casino online",
+  authors: [{ name: "Higher Lower Casino" }],
+  viewport: "width=device-width, initial-scale=1",
+  robots: "index, follow",
+  openGraph: {
+    title: "Higher Lower Casino - Premium Card Prediction Game",
+    description: "The ultimate casino card prediction experience with real-time odds and professional graphics",
+    type: "website",
+    images: [
+      {
+        url: "/casino-preview.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Higher Lower Casino Game Preview"
+      }
+    ]
+  }
 };
 
 export default function RootLayout({
